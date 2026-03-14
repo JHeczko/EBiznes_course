@@ -1,0 +1,41 @@
+networks:
+  my-network:
+    driver: bridge
+
+services:
+  zadanie30:
+    image: jheczko/zad30:1.0
+    container_name: zadanie30
+    
+    stdin_open: true
+    tty: true
+
+    networks:
+      - my-network
+  zadanie35:
+    image: jheczko/zad35
+    container_name: zadanie35
+
+    stdin_open: true
+    tty: true
+
+    networks:
+      - my-network
+  zadanie40:
+    image: jheczko/zad40
+    container_name: zadanie40
+
+    stdin_open: true
+    tty: true
+
+    networks:
+      - my-network
+  zadanie45:
+    image: jheczko/zad45
+    container_name: zadanie45
+
+    stdin_open: true
+    tty: true
+
+    networks:
+      - my-network
