@@ -36,6 +36,13 @@ zgodnie z CRUD
 skrypt uruchamiający aplikację via ngrok
 - 5.0 Należy dodać konfigurację CORS dla dwóch hostów dla metod CRUD
 
+Git commits:
+- 3.0: https://github.com/JHeczko/EBiznes_course/commit/db44f3f59a6474b92adec3615148b2cf2bb1eaf2
+- 3.5:
+- 4.0: 
+- 4.5:
+- 5.0:
+
 Kontrolery mogą bazować na listach zamiast baz danych. CRUD: show all,
 show by id (get), update (put), delete (delete), add (post).
 

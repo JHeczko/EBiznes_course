@@ -4,6 +4,22 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /products   controllers.ProductController.getAll
+# index home page route
 GET     /     controllers.HomeController.index()
+
+# Create route: /products/create?name=Laptop&count=10
+POST    /products/create          controllers.ProductController.create(name: String, count: Int)
+
+# Read route: /products/read?id=1
+GET     /products/read            controllers.ProductController.read(id: Int)
+
+# Update route: /products/update?id=1&name=NowaNazwa&count=5
+PATCH   /products/update    controllers.ProductController.update(id: Int, name: Option[String], count: Option[Int])
+# Delete route: /products/delete?id=1
+DELETE  /products/delete          controllers.ProductController.delete(id: Int)
+
+# GetAll (bez parametrów)
+GET     /products/all             controllers.ProductController.getAll
+
+# assets play route
 GET     /assets/*file     controllers.Assets.versioned(path="/public", file: Asset)
