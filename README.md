@@ -38,7 +38,7 @@ skrypt uruchamiający aplikację via ngrok
 
 Git commits:
 - 3.0: https://github.com/JHeczko/EBiznes_course/commit/db44f3f59a6474b92adec3615148b2cf2bb1eaf2
-- 3.5:
+- 3.5: https://github.com/JHeczko/EBiznes_course/commit/c8db801625b89cd3e93e73660158f46ce9a95167
 - 4.0: 
 - 4.5:
 - 5.0:
