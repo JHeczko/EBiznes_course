@@ -39,9 +39,9 @@ skrypt uruchamiający aplikację via ngrok
 Git commits:
 - 3.0: https://github.com/JHeczko/EBiznes_course/commit/db44f3f59a6474b92adec3615148b2cf2bb1eaf2
 - 3.5: https://github.com/JHeczko/EBiznes_course/commit/c8db801625b89cd3e93e73660158f46ce9a95167
-- 4.0: 
-- 4.5:
-- 5.0:
+- 4.0: https://github.com/JHeczko/EBiznes_course/commit/ed8509629e11e30ee3453181ca3ace63a8566581
+- 4.5: https://github.com/JHeczko/EBiznes_course/commit/26ae1868774f4402ae62462791d6ff9923fe2ae2
+- 5.0: https://github.com/JHeczko/EBiznes_course/commit/c90328bd50b36449980113a310ec7c528bd2aae2
 
 Kontrolery mogą bazować na listach zamiast baz danych. CRUD: show all,
 show by id (get), update (put), delete (delete), add (post).
