@@ -43,13 +43,11 @@ Git commits:
 - 4.5: https://github.com/JHeczko/EBiznes_course/commit/26ae1868774f4402ae62462791d6ff9923fe2ae2
 - 5.0: https://github.com/JHeczko/EBiznes_course/commit/c90328bd50b36449980113a310ec7c528bd2aae2
 
+Video:
+- https://drive.google.com/file/d/1Skt6fDH0UW0RJKDeX7j2TSBFlBSrdWTM/view?usp=sharing
+
 Kontrolery mogą bazować na listach zamiast baz danych. CRUD: show all,
 show by id (get), update (put), delete (delete), add (post).
-
-Trzeba filma nagrac, z tym ze to dziala
-
-https://scalatra.org/getting-started/first-project.html
-https://www.playframework.com/
 
 ## Zadanie 3 - Kotlin
 
