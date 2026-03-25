@@ -1,25 +1,25 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# https://www.playframework.com/documentation/latest/ScalaRouting
-# ~~~~
+# assets play route
+GET /assets/*file controllers.Assets.versioned(path="/public", file: Asset)
 
-# An example controller showing a sample home page
-# index home page route
-GET     /     controllers.HomeController.index()
-
-# Create route: /products/create?name=Laptop&count=10
-POST    /products/create          controllers.ProductController.create(name: String, count: Int)
-
-# Read route: /products/read?id=1
+# ============ PRODUCT API ============
+GET     /products/all             controllers.ProductController.getAll
+# Przykład: POST /products/create?name=Monitor&price=599.99&catId=1
+POST    /products/create          controllers.ProductController.create(name: String, price: Double, catId: Int)
 GET     /products/read            controllers.ProductController.read(id: Int)
-
-# Update route: /products/update?id=1&name=NowaNazwa&count=5
-PATCH   /products/update    controllers.ProductController.update(id: Int, name: Option[String], count: Option[Int])
-# Delete route: /products/delete?id=1
+# Przykład: PATCH /products/update?id=1&price=2500.0
+PATCH   /products/update          controllers.ProductController.update(id: Int, name: Option[String], price: Option[Double], catId: Option[Int])
 DELETE  /products/delete          controllers.ProductController.delete(id: Int)
 
-# GetAll (bez parametrów)
-GET     /products/all             controllers.ProductController.getAll
+# ============ CATEGORY API ============
+GET     /categories/all           controllers.CategoryController.getAll
+POST    /categories/create        controllers.CategoryController.create(name: String)
+GET     /categories/read          controllers.CategoryController.read(id: Int)
+PATCH   /categories/update        controllers.CategoryController.update(id: Int, name: Option[String])
+DELETE  /categories/delete        controllers.CategoryController.delete(id: Int)
 
-# assets play route
-GET     /assets/*file     controllers.Assets.versioned(path="/public", file: Asset)
+# ============ CART API ============
+GET     /cart/all                 controllers.CartController.all
+POST    /cart/create              controllers.CartController.create(productId: Int, quantity: Int)
+GET     /cart/read                controllers.CartController.read(productId: Int)
+PATCH   /cart/update              controllers.CartController.update(productId: Int, quantity: Int)
+DELETE  /cart/delete              controllers.CartController.delete(productId: Int)

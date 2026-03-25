@@ -3,66 +3,64 @@ package controllers
 import javax.inject._
 import play.api.mvc._
 import play.api.libs.json._
-import scala.collection.mutable
-case class Product(id: Int, name: String, price: Double)
-
-object Product {
-  implicit val format = Json.format[Product]
-}
+import models.{DataBase, Product}
 
 @Singleton
 class ProductController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
-  var db_products = mutable.ListBuffer(
-    Product(1, "Laptop", 3000),
-    Product(2, "Mouse", 100)
-  )
-
   def getAll = Action {
-    Ok(Json.toJson(db_products))
+    Ok(Json.toJson(DataBase.products))
   }
 
-  def create(name: String, count: Int) = Action {
-    // Bezpieczne generowanie ID
-    val new_id = if (db_products.isEmpty) 1 else db_products.map(_.id).max + 1
-    val new_prod = Product(new_id, name, count)
-
-    db_products.addOne(new_prod)
-    Ok(Json.toJson(new_prod))
-  }
-
-  def read(id: Int) = Action {
-    val productOpt = db_products.find(_.id == id)
-
-    if (productOpt.isDefined) {
-      Ok(Json.toJson(productOpt.get))
+  // POST: /products/create?name=X&price=1.0&catId=1
+  def create(name: String, price: Double, catId: Int) = Action {
+    // Walidacja: czy kategoria istnieje w bazie?
+    if (DataBase.categories.exists(_.id == catId)) {
+      val new_id = if (DataBase.products.isEmpty) 1 else DataBase.products.map(_.id).max + 1
+      val new_prod = Product(new_id, name, price, catId)
+      DataBase.products.addOne(new_prod)
+      Ok(Json.toJson(new_prod))
     } else {
-      NotFound("No such product")
+      BadRequest(Json.obj("error" -> "Category does not exist"))
     }
   }
 
-  def update(id: Int, name: Option[String], count: Option[Int]) = Action {
-    val index_to_update = db_products.indexWhere(_.id == id)
+  def read(id: Int) = Action {
+    DataBase.products.find(_.id == id) match {
+      case Some(p) => Ok(Json.toJson(p))
+      case None => NotFound("No such product")
+    }
+  }
 
-    if (index_to_update != -1) {
-      val stary_prod = db_products(index_to_update)
+  // PATCH: /products/update?id=1&name=X&price=2.0&catId=1
+  def update(id: Int, name: Option[String], price: Option[Double], catId: Option[Int]) = Action {
+    val index = DataBase.products.indexWhere(_.id == id)
 
-      // Logika "jeśli podano, to weź nowe, inaczej stare"
-      val final_name = if (name.isDefined) name.get else stary_prod.name
-      val final_count = if (count.isDefined) count.get else stary_prod.price.toInt // uwaga na typy!
+    if (index != -1) {
+      val old = DataBase.products(index)
 
-      val updated_prod = Product(id, final_name, final_count.toDouble)
+      // Jeśli podano catId, sprawdź czy kategoria istnieje
+      val validCatId = catId match {
+        case Some(cid) if DataBase.categories.exists(_.id == cid) => cid
+        case _ => old.categoryId
+      }
 
-      db_products.update(index_to_update, updated_prod)
-      Ok(Json.toJson(updated_prod))
+      val updated = Product(
+        id,
+        name.getOrElse(old.name),
+        price.getOrElse(old.price),
+        validCatId
+      )
+
+      DataBase.products.update(index, updated)
+      Ok(Json.toJson(updated))
     } else {
       NotFound("No such product")
     }
   }
 
   def delete(id: Int) = Action {
-    // Usuwamy ten konkretny produkt (zostawiamy te, które mają inne ID)
-    db_products.filterInPlace(_.id != id)
-    Ok(Json.toJson("Deleted " + id))
+    DataBase.products.filterInPlace(_.id != id)
+    Ok(Json.obj("message" -> s"Deleted $id"))
   }
 }
