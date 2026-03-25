@@ -13,6 +13,6 @@ RUN adduser -S scala-server && \
 
 USER scala-server
 
-EXPOSE 9000 
+EXPOSE 9000
 
 CMD ["sbt", "run"]
