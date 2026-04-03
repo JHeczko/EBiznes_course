@@ -59,3 +59,6 @@ show by id (get), update (put), delete (delete), add (post).
 - 5.0 Aplikacja obsłuży dodatkowo jedną z platform: Slack lub Messenger
 
 **Aplikację należy uruchomić na dockerze.**
+
+Github:
+- 3.0: https://github.com/JHeczko/EBiznes_course/commit/ff5f69c251c5a9972bcebfc62a4dc86b67d2c3d1
