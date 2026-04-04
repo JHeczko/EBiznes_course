@@ -62,3 +62,4 @@ show by id (get), update (put), delete (delete), add (post).
 
 Github:
 - 3.0: https://github.com/JHeczko/EBiznes_course/commit/ff5f69c251c5a9972bcebfc62a4dc86b67d2c3d1
+- 3.5: https://github.com/JHeczko/EBiznes_course/commit/6b2b0e5d98fe706934a1416b97b3eda694022a6a
