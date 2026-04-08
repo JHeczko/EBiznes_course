@@ -22,7 +22,9 @@ fun main() {
         Category("Laptopy"),    // ID: 1
         Category("Podzespoly"), // ID: 2
         Category("Akcesoria"),  // ID: 3
-        Category("Monitory")    // ID: 4
+        Category("Monitory"),    // ID: 4
+        Category("Jedzenie")    // ID: 5
+
     )
 
     val products: List<Product> = listOf(
@@ -67,6 +69,8 @@ fun main() {
 
                 // zad 4.0
                 if (text.startsWith("!cat")) {
+                    println("Category print")
+
                     var messege_back = "-----All avaible categories-----\n"
 
                     for (cat in categories) {
@@ -77,6 +81,34 @@ fun main() {
                     println("Listed categories")
                 }
 
+                // zad 4.5
+                if (text.startsWith("!prod")) {
+                    println("Prod print")
+                    val cat_id = text.substringAfter("!prod ").trim().toIntOrNull()
+
+                    if (cat_id == null) {
+                        message.channel.createMessage("Please enter a category number!")
+                    }else {
+
+                        val category_name = categories.find({ x -> x.cat_id == cat_id })?.cat_name
+                        val filtered_prods = products.filter( {x -> x.cat_id == cat_id} )
+
+                        if(filtered_prods.isEmpty()) {
+                            message.channel.createMessage("No avaible products for category ${category_name ?: cat_id}!")
+                        }else{
+                            var out_string = "Available products from category ${category_name}:\n"
+
+                            for (prod in products) {
+                                if (prod.cat_id == cat_id) {
+                                    out_string += " - ${prod.prod_name}: ${prod.price} PLN\n"
+                                }
+                            }
+
+                            message.channel.createMessage(out_string)
+
+                        }
+                    }
+                }
             }
 
             routing {
