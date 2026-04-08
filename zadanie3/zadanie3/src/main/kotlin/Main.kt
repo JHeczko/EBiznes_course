@@ -63,7 +63,13 @@ fun main() {
 
                 // ping handler
                 if (text.startsWith("!ping:")) {
-                    message.channel.createMessage("pong: ${text.subSequence(6, text.length)}")
+                    val text_message = text.substringAfter("!ping")
+
+                    if (text_message.isEmpty()){
+                        message.channel.createMessage("pong")
+                    } else {
+                        message.channel.createMessage("pong: ${text_message}")
+                    }
                     println("PingPong: $text")
                 }
 
