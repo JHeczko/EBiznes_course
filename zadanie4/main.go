@@ -33,6 +33,23 @@ func main() {
 
 	}
 
+	categoryEndpoints := e.Group("/category")
+	{
+		categoryEndpoints.GET("", handlers.GetCategories(db))
+		categoryEndpoints.GET("/:id", handlers.GetCategory(db))
+		categoryEndpoints.POST("", handlers.CreateCategory(db))
+		categoryEndpoints.PATCH("/:id", handlers.UpdateCategory(db))
+		categoryEndpoints.DELETE("/:id", handlers.DeleteCategory(db))
+	}
+
+	cartEndpoints := e.Group("/cart")
+	{
+		cartEndpoints.GET("/:user_id", handlers.GetItems(db))
+		cartEndpoints.POST("/:user_id", handlers.CreateItem(db))
+		cartEndpoints.PATCH("/:user_id", handlers.UpdateItem(db))
+		cartEndpoints.DELETE("/:user_id", handlers.DeleteItem(db))
+	}
+
 	e.Logger.Fatal(e.Start(":13000"))
 
 }

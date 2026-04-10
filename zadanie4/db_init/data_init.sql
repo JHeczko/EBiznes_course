@@ -1,71 +1,70 @@
 -- Kompletny cykl testu
-DROP TABLE Category;
-DROP TABLE Products;
-
--- Włączenie wsparcia dla kluczy obcych (obowiązkowe w SQLite!)
+PRAGMA foreign_keys = OFF;
+DROP TABLE IF EXISTS Basket;
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Products;
+DROP TABLE IF EXISTS Category;
 PRAGMA foreign_keys = ON;
 
--- Tabele
-CREATE TABLE IF NOT EXISTS Category(CategoryID int primary key, CategoryName text UNIQUE);
+-- 1. Kategorie
+CREATE TABLE Category (
+    CategoryID INTEGER PRIMARY KEY AUTOINCREMENT, 
+    CategoryName TEXT UNIQUE
+);
 
-CREATE TABLE IF NOT EXISTS Products (ProductID INTEGER PRIMARY KEY,ProductName TEXT, Price INTEGER, CategoryID INTEGER, FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID) ON DELETE SET NULL ON UPDATE CASCADE);
+-- 2. Produkty
+CREATE TABLE Products (
+    ProductID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ProductName TEXT, 
+    Price REAL, -- Zmienione na REAL dla groszy
+    CategoryID INTEGER, 
+    FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID) ON DELETE SET NULL ON UPDATE CASCADE
+);
 
--- Czyścimy tabele na wypadek, gdybyś już coś tam miał
-DELETE FROM Products;
-DELETE FROM Category;
+-- 3. Użytkownicy (Dodane!)
+CREATE TABLE Users (
+    UserID INTEGER PRIMARY KEY AUTOINCREMENT, 
+    UserName TEXT UNIQUE,
+    Email TEXT
+);
 
--- 1. Dodawanie kategorii (7 kategorii)
-INSERT INTO Category (CategoryID, CategoryName) VALUES 
-(1, 'Elektronika'),
-(2, 'Dom i Ogród'),
-(3, 'Sport i Turystyka'),
-(4, 'Moda'),
-(5, 'Książki'),
-(6, 'Zdrowie i Uroda'),
-(7, 'Motoryzacja');
+-- 4. Koszyk (Poprawiony klucz obcy!)
+CREATE TABLE Basket (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT, 
+    UserID INTEGER, 
+    ProductID INTEGER, 
+    Quantity INTEGER DEFAULT 1,
+    FOREIGN KEY(UserID) REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE, 
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
--- 2. Dodawanie produktów (30 produktów rozrzuconych po kategoriach)
+CREATE UNIQUE INDEX idx_user_product on Basket(UserID, ProductID);
+
+-- WSTAWIANIE DANYCH --
+
+-- Kategorie
+INSERT INTO Category (CategoryName) VALUES 
+('Elektronika'), ('Dom i Ogród'), ('Sport i Turystyka'), 
+('Moda'), ('Książki'), ('Zdrowie i Uroda'), ('Motoryzacja');
+
+-- Produkty
 INSERT INTO Products (ProductName, Price, CategoryID) VALUES 
--- 1. Elektronika
-('Smartfon Galaxy', 2999.99, 1), 
-('Laptop Pro', 5499.00, 1), 
-('Słuchawki BT', 199.50, 1), 
-('Monitor 4K', 1200.00, 1), 
-('Klawiatura Mechaniczna', 350.00, 1),
+('Smartfon Galaxy', 2999.99, 1), ('Laptop Pro', 5499.00, 1), ('Słuchawki BT', 199.50, 1),
+('Wiertarka Akumulatorowa', 450.00, 2), ('Lampa Stojąca', 120.00, 2),
+('Namiot 3-osobowy', 600.00, 3), ('Rower Górski', 2100.00, 3),
+('Koszulka Bawełniana', 49.99, 4), ('Jeansy Slim', 129.00, 4),
+('Wiedźmin: Ostatnie Życzenie', 39.90, 5), ('Finansowy Ninja', 69.00, 5),
+('Krem Nawilżający', 28.50, 6), ('Olej Silnikowy 5W30', 160.00, 7);
 
--- 2. Dom i Ogród
-('Wiertarka Akumulatorowa', 450.00, 2), 
-('Lampa Stojąca', 120.00, 2), 
-('Zestaw Noży', 299.00, 2), 
-('Kosiarka', 899.99, 2), 
-('Poduszka Dekoracyjna', 45.00, 2),
+-- 5. Dodawanie Userów
+INSERT INTO Users (UserName, Email) VALUES 
+('Wrex', 'wrex@example.com'),
+('Jakub', 'jakub@test.pl'),
+('Admin', 'admin@sklep.pl');
 
--- 3. Sport i Turystyka
-('Namiot 3-osobowy', 600.00, 3), 
-('Rower Górski', 2100.00, 3), 
-('Plecak Trekkingowy', 320.00, 3), 
-('Hantle 5kg', 80.00, 3), 
-('Mata do Jogi', 55.00, 3),
-
--- 4. Moda
-('Koszulka Bawełniana', 49.99, 4), 
-('Jeansy Slim', 129.00, 4), 
-('Kurtka Przeciwdeszczowa', 180.00, 4), 
-('Skarpetki Sportowe', 15.00, 4), 
-('Czapka z Daszkiem', 35.00, 4),
-
--- 5. Książki
-('Wiedźmin: Ostatnie Życzenie', 39.90, 5), 
-('Finansowy Ninja', 69.00, 5), 
-('Kuchnia Polska - Przepisy', 25.00, 5), 
-('Atlas Świata', 110.00, 5), 
-('Kryminał pod napięciem', 32.00, 5),
-
--- 6. Zdrowie i Uroda
-('Krem Nawilżający', 28.50, 6), 
-('Szampon do Włosów', 18.00, 6), 
-('Szczoteczka Soniczna', 149.99, 6),
-
--- 7. Motoryzacja
-('Olej Silnikowy 5W30', 160.00, 7), 
-('Wycieraczki Samochodowe', 45.00, 7);
+-- 6. Dodawanie do Koszyka (Przykładowe zamówienia)
+INSERT INTO Basket (UserID, ProductID, Quantity) VALUES 
+(1, 1, 1), -- Wrex kupuje Smartfona
+(1, 3, 2), -- Wrex kupuje 2 pary słuchawek
+(2, 6, 1), -- Jakub kupuje Namiot
+(2, 10, 1); -- Jakub kupuje Wiedźmina

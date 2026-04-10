@@ -23,14 +23,14 @@ func GetProducts(db *gorm.DB) echo.HandlerFunc{
 func GetProduct(db *gorm.DB) echo.HandlerFunc{
 	return func (c echo.Context) error{
 		id := c.Param("id")
-		var products []models.Product
+		var products models.Product
 
-		result := db.Preload("Category").Where("ProductID = ?", id).Find(&products)
+		result := db.Preload("Category").Where("ProductID = ?", id).First(&products)
 
 		if result.Error != nil {
 			c.Logger().Error(result.Error) 
 			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"message": "Błąd podczas pobierania danych z bazy",
+				"message": "Error while gettig category",
 			})
 		}
 
@@ -39,28 +39,46 @@ func GetProduct(db *gorm.DB) echo.HandlerFunc{
 	}
 }
 
-func CreateProduct(db *gorm.DB) echo.HandlerFunc{
-	return func (c echo.Context) error{
+func CreateProduct(db *gorm.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
 		name := c.QueryParam("name")
 		priceStr := c.QueryParam("price")
 		categoryStr := c.QueryParam("cat")
 
-		price, _ := strconv.ParseFloat(priceStr,32)
+		
+		if name == "" {
+			return echo.NewHTTPError(400, "Product name cannot be empty")
+		}
 
-		catInt, _ := strconv.Atoi(categoryStr)
+		priceFloat, err := strconv.ParseFloat(priceStr, 32)
+		if err != nil {
+			c.Logger().Errorf("Price conversion error: %v", err)
+			return echo.NewHTTPError(400, "Invalid price format. Must be a number (e.g., 29.99)")
+		}
+		price := float32(priceFloat)
+
+		catInt, err := strconv.Atoi(categoryStr)
+		if err != nil {
+			c.Logger().Errorf("Category ID conversion error: %v", err)
+			return echo.NewHTTPError(400, "Category ID must be an integer")
+		}
 		catID := uint(catInt)
 
-		p := new(models.Product)
-		p.ProductName=name
-		p.Price=float32(price)
-		p.CategoryID=&catID
+		
+		p := &models.Product{
+			ProductName: name,
+			Price:       price,
+			CategoryID:  &catID,
+		}
 
-		result := db.Preload("Category").Create(p)
+		result := db.Create(p)
+		if result.Error != nil {
+			c.Logger().Error("Database error during product creation: ", result.Error)
+			return echo.NewHTTPError(500, "Could not save product to database")
+		}
 
-		db.Preload("Category").Where("ProductID = ?", p.ProductID).First(p)
-
-		if result.Error != nil{
-			return echo.NewHTTPError(500, "Something went wrong. Not added the instance to database")
+		if err := db.Preload("Category").First(p, p.ProductID).Error; err != nil {
+			c.Logger().Warnf("Product created, but failed to preload category: %v", err)
 		}
 
 		return c.JSON(http.StatusOK, p)
