@@ -81,3 +81,7 @@ listy)
 - 4.5 Należy stworzyć model kategorii i dodać relację między kategorią,
 a produktem
 - 5.0 pogrupować zapytania w gorm’owe scope'y
+
+- 3.0 & 3.5: https://github.com/JHeczko/EBiznes_course/commit/8a1ed419c192fe8c761927dcb1eaf6b669d65cb0
+- 4.0 & 4.5: https://github.com/JHeczko/EBiznes_course/commit/02de5c4694462827ebb67b3aadd38721d30c8d6f
+- 5.0: https://github.com/JHeczko/EBiznes_course/commit/0abe3d79202b435cc84e275a17c75a8a4aa02de3
