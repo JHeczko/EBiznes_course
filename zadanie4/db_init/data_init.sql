@@ -15,8 +15,8 @@ CREATE TABLE Category (
 -- 2. Produkty
 CREATE TABLE Products (
     ProductID INTEGER PRIMARY KEY AUTOINCREMENT,
-    ProductName TEXT, 
-    Price REAL, -- Zmienione na REAL dla groszy
+    ProductName TEXT UNIQUE, 
+    Price REAL,
     CategoryID INTEGER, 
     FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID) ON DELETE SET NULL ON UPDATE CASCADE
 );

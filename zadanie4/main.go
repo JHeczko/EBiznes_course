@@ -5,6 +5,7 @@ import (
 	// "github.com/labstack/echo/v4"
 	"zadanie4/handlers"
 
+	//"github.com/labstack/echo/middleware"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -22,6 +23,9 @@ func main() {
 	// echo init
 	e := echo.New()
 	
+	// CORS middleware
+	//e.Use(middleware.CORS())
+
 	// products endpoints
 	productsEndpoints := e.Group("/products")
 	{
@@ -51,5 +55,4 @@ func main() {
 	}
 
 	e.Logger.Fatal(e.Start(":13000"))
-
 }
