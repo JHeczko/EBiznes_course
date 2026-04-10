@@ -104,7 +104,7 @@ func UpdateProduct(db *gorm.DB) echo.HandlerFunc{
 			return c.String(404, "No product finded with specific id")
 		}
 
-		return c.String(200,"git")
+		return c.String(200,fmt.Sprintf("Updated product with id %d", id))
 	}
 }
 
