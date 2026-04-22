@@ -2,7 +2,7 @@
 PRAGMA foreign_keys = OFF;
 DROP TABLE IF EXISTS Basket;
 DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS Products;
+DROP TABLE IF EXISTS ProductsPage;
 DROP TABLE IF EXISTS Category;
 PRAGMA foreign_keys = ON;
 

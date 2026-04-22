@@ -1,7 +1,3 @@
-*.db
-*.mod
-.git/
-
 # Logs
 logs
 *.log

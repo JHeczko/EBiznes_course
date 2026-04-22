@@ -88,3 +88,14 @@ Github:
 - 5.0: https://github.com/JHeczko/EBiznes_course/commit/0abe3d79202b435cc84e275a17c75a8a4aa02de3
 
 Demo: https://drive.google.com/file/d/1in7W6-iRclpbwEH2frtpNNUIAoRpqPYa/view?usp=sharing
+
+## Zadanie 5 - FrontEnd: React
+Należy stworzyć aplikację kliencką wykorzystując bibliotekę **React.js**. W ramach projektu należy stworzyć trzy komponenty: `Produkty`, `Koszyk` oraz `Płatności`. `Koszyk` oraz `Płatności` powinny wysyłać do **aplikacji serwerowej dane**, a w `Produktach` powinniśmy pobierać dane o **produktach z aplikacji serwerowej**. Aplikacja serwera w jednym z trzech języków: `Kotlin`, `Scala`, `Go`. Dane pomiędzy wszystkimi komponentami powinny być przesyłane za pomocą `React hooks`.
+
+- 3.0: W ramach projektu należy stworzyć dwa komponenty: Produkty oraz Płatności; Płatności powinny wysyłać do aplikacji serwerowej dane, a w Produktach powinniśmy pobierać dane o produktach z aplikacji serwerowej;
+- 3.5: Należy dodać Koszyk wraz z widokiem; należy wykorzystać routing
+- 4.0: Dane pomiędzy wszystkimi komponentami powinny być przesyłane za pomocą React hooks
+- 4.5: Należy dodać skrypt uruchamiający aplikację serwerową oraz kliencką na dockerze via docker-compose
+- 5.0: Należy wykorzystać axios’a oraz dodać nagłówki pod CORS
+
+Demo

@@ -31,7 +31,7 @@ func FilterCheapProduct(threshold float32) func(db *gorm.DB) *gorm.DB{
 
 func FilterBasketByPrice(threshold float32) func (db *gorm.DB) *gorm.DB{
 	return func (db *gorm.DB) *gorm.DB{
-		return db.Joins("JOIN Products ON Products.ProductID=Basket.ProductID").
+		return db.Joins("JOIN ProductsPage ON ProductsPage.ProductID=Basket.ProductID").
 		Scopes(FilterCheapProduct(threshold))
 	}
 }

@@ -6,7 +6,7 @@ type Category struct{
 	CategoryName string `gorm:"column:CategoryName" json:"name"`
 
 	// Relations
-	Products []Product `gorm:"foreignKey:CategoryID" json:"products,omitempty"`
+	ProductsPage []Product `gorm:"foreignKey:CategoryID" json:"products,omitempty"`
 }
 
 func (Category) TableName() string {
@@ -25,7 +25,7 @@ type Product struct{
 }
 
 func (Product) TableName() string{
-	return "Products"
+	return "ProductsPage"
 }
 
 // ====== USERS ======
