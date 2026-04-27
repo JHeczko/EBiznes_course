@@ -17,7 +17,7 @@ func GetProducts(db *gorm.DB) echo.HandlerFunc{
     return func (c echo.Context) error {
         var products []models.Product
 
-		query := db.Model(&models.Product{})
+		query := db.Model(&models.Product{}).Preload("Category")
 
 		if c.QueryParam("cheap") == "true"{
 			query = query.Scopes(models.FilterCheapProduct(200))

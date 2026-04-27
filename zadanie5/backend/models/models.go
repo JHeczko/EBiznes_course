@@ -25,7 +25,7 @@ type Product struct{
 }
 
 func (Product) TableName() string{
-	return "ProductsPage"
+	return "Products"
 }
 
 // ====== USERS ======
@@ -56,4 +56,19 @@ type Basket struct{
 
 func (Basket) TableName() string{
 	return "Basket"
+}
+
+type Payments struct {
+	ID          uint      `gorm:"primaryKey;column:ID" json:"id"`
+	UserID      uint      `gorm:"column:UserID" json:"user_id"`
+	TotalAmount float64   `gorm:"column:TotalAmount" json:"total_amount"`
+	Status      string    `gorm:"column:Status" json:"status"`
+	CreatedAt   string `gorm:"column:CreatedAt" json:"created_at"`
+
+	// relations
+	User *Users `gorm:"foreignKey:UserID;references:UserID" json:"user,omitempty"`
+}
+
+func (Payments) TableName() string{
+	return "Payments"
 }

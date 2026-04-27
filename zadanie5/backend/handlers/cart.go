@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"zadanie4/models"
 
+	//"gorm.io/gorm/clause"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -66,24 +67,47 @@ func CreateItem(db *gorm.DB) echo.HandlerFunc {
 			quantity = uint(q_conv)
 		}
 
+		// item := models.Basket{
+		// 	UserID:    userID,
+		// 	ProductID: prodID,
+		// 	Quantity:  quantity,
+		// }
+
+		// err := db.Clauses(
+		// 	clause.OnConflict{
+		// 		Columns: []clause.Column{
+		// 			{Name: "user_id"},
+		// 			{Name: "product_id"},
+		// 		},
+		// 		DoUpdates: clause.Assignments(map[string]interface{}{
+		// 			"quantity": gorm.Expr("quantity + ?", quantity),
+		// 		}),
+		// 	},
+		// 	clause.Returning{},
+		// ).Create(&item).Error
+
 		var item models.Basket
 		err := db.Transaction(func(tx *gorm.DB) error {
-			err := tx.Scopes(models.ByUserID(userID)).Scopes(models.ByProductID(prodID)).First(&item).Error
-			if err == nil {
+			out := tx.Scopes(models.ByUserID(userID)).
+				Scopes(models.ByProductID(prodID)).
+				Take(&item)
+
+			if out.Error != nil && !errors.Is(out.Error, gorm.ErrRecordNotFound) {
+				return out.Error
+			}
+
+			if out.RowsAffected > 0 {
 				item.Quantity += quantity
 				return tx.Save(&item).Error
-			} else {
-				if errors.Is(err, gorm.ErrRecordNotFound) {
-					item = models.Basket{
-						UserID:    userID,
-						ProductID: prodID,
-						Quantity:  quantity,
-					}
-					return tx.Create(&item).Error
-				} else {
-					return err
-				}
 			}
+
+			// brak rekordu → tworzymy
+			item = models.Basket{
+				UserID:    userID,
+				ProductID: prodID,
+				Quantity:  quantity,
+			}
+			return tx.Create(&item).Error
 		})
 
 		if err != nil {
@@ -141,27 +165,58 @@ func UpdateItem(db *gorm.DB) echo.HandlerFunc {
 			return echo.NewHTTPError(500, "Database error while updating cart quantity")
 		}
 
-		return c.String(200, fmt.Sprintf("Updated cart for user %d: product %d now has quantity %d", userID, prodID, quantity))
+		return c.JSON(200, item)
 	}
 }
 
 func DeleteItem(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userId_conv, err_conv := strconv.Atoi(c.Param("user_id"))
-		if err_conv != nil {
-			c.Logger().Errorf("UserID conversion failed: %v", err_conv)
+
+		userIdConv, err := strconv.Atoi(c.Param("user_id"))
+		if err != nil {
+			c.Logger().Errorf("UserID conversion failed: %v", err)
 			return echo.NewHTTPError(400, "Invalid User ID")
 		}
-		userID := uint(userId_conv)
+		userID := uint(userIdConv)
 
-		prodID_conv, err_conv := strconv.Atoi(c.QueryParam("prod_id"))
-		if err_conv != nil {
-			c.Logger().Errorf("ProductID conversion failed: %v", err_conv)
+		prodParam := c.QueryParam("prod_id")
+
+		var result *gorm.DB
+
+		// brak prod_id → usuń wszystko
+		if prodParam == "" {
+			result = db.
+				Scopes(models.ByUserID(userID)).
+				Delete(&models.Basket{})
+
+			if result.Error != nil {
+				c.Logger().Errorf("Delete ALL failed for User %d: %v", userID, result.Error)
+				return echo.NewHTTPError(500, "Internal database error during deletion")
+			}
+
+			if result.RowsAffected == 0 {
+				return echo.NewHTTPError(404, fmt.Sprintf("No items for user %d. Deleted nothing", userID))
+			}
+
+			return c.JSON(200, map[string]interface{}{
+				"user_id": userID,
+				"deleted": result.RowsAffected,
+				"type":    "all",
+			})
+		}
+
+		// jest prod_id → usuń jeden
+		prodIDConv, err := strconv.Atoi(prodParam)
+		if err != nil {
+			c.Logger().Errorf("ProductID conversion failed: %v", err)
 			return echo.NewHTTPError(400, "Invalid Product ID")
 		}
-		prodID := uint(prodID_conv)
+		prodID := uint(prodIDConv)
 
-		result := db.Scopes(models.ByUserID(userID)).Scopes(models.ByProductID(prodID)).Delete(&models.Basket{})
+		result = db.
+			Scopes(models.ByUserID(userID)).
+			Scopes(models.ByProductID(prodID)).
+			Delete(&models.Basket{})
 
 		if result.Error != nil {
 			c.Logger().Errorf("Delete failed for User %d, Product %d: %v", userID, prodID, result.Error)
@@ -172,6 +227,11 @@ func DeleteItem(db *gorm.DB) echo.HandlerFunc {
 			return echo.NewHTTPError(404, "Item not found in cart; nothing to delete")
 		}
 
-		return c.String(200, fmt.Sprintf("Successfully removed product %d from user %d's cart", prodID, userID))
+		return c.JSON(200, map[string]interface{}{
+			"user_id": userID,
+			"prod_id": prodID,
+			"deleted": result.RowsAffected,
+			"type":    "single",
+		})
 	}
 }

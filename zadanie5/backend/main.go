@@ -1,20 +1,34 @@
 package main
 
 import (
-	// "net/http"
-	// "github.com/labstack/echo/v4"
+	"net/http"
 	"zadanie4/handlers"
-
-	//"github.com/labstack/echo/middleware"
+	
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+
+	"log"
+	"os"
 )
 
 
 func main() {
 	// databse init
-	db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
+	//db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("/root/app/database.db"), &gorm.Config{
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			logger.Config{
+				LogLevel:                  logger.Error,
+				IgnoreRecordNotFoundError: true,
+				Colorful:                  true,
+			},
+		),
+	})
+
 
 	if err != nil{
 		panic("Blad otwarcia bazy danych")
@@ -24,7 +38,21 @@ func main() {
 	e := echo.New()
 	
 	// CORS middleware
-	//e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+    AllowOrigins: []string{"http://localhost:5173"},
+    AllowMethods: []string{
+        http.MethodGet,
+        http.MethodPost,
+        http.MethodPatch,
+        http.MethodDelete,
+    },
+    AllowHeaders: []string{
+        echo.HeaderOrigin,
+        echo.HeaderContentType,
+        echo.HeaderAccept,
+    },
+    AllowCredentials: true,
+	}))
 
 	// products endpoints
 	productsEndpoints := e.Group("/products")
@@ -52,6 +80,13 @@ func main() {
 		cartEndpoints.POST("/:user_id", handlers.CreateItem(db))
 		cartEndpoints.PATCH("/:user_id", handlers.UpdateItem(db))
 		cartEndpoints.DELETE("/:user_id", handlers.DeleteItem(db))
+	}
+
+	paymentsEndpoints := e.Group("/payments")
+
+	{
+		paymentsEndpoints.GET("/:user_id", handlers.GetPayments(db))
+		paymentsEndpoints.POST("/:user_id", handlers.AddPayment(db))
 	}
 
 	e.Logger.Fatal(e.Start(":13000"))

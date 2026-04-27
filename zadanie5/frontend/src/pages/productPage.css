@@ -1,0 +1,88 @@
+.products-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/*.product-container {*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    justify-content: left;*/
+/*    gap: 20px;*/
+
+/*    width: 90%;*/
+/*    max-width: 1300px;*/
+/*    margin: 0 auto;*/
+/*}*/
+
+.product-container{
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    width: 90%;
+    gap: 1.7rem;
+    margin: 0 auto 1.7rem;
+}
+
+.card-info{
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0;
+}
+
+.product-card {
+    background-color: #eee;
+    display: flex;
+    flex-direction: column; /* Układ pionowy */
+    /*width: 70rem;*/
+    width: 100%;                /* Karta zajmuje całą szerokość kolumny */
+    height: 14rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box; /* Ważne, żeby padding nie rozwalał wymiarów */
+}
+
+.card-footer {
+    margin-top: auto;      /* Popycha całą stopkę na sam dół karty */
+    display: flex;         /* Ustawia cenę i guzik obok siebie */
+    justify-content: space-between; /* Cena na lewo, guzik na prawo */
+    align-items: flex-end; /* Wyrównuje je do dołu wewnątrz stopki */
+    width: 100%;
+}
+
+.price-tag {
+    font-weight: bold;
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.add-to-cart-btn {
+    background-color: #c084fc;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.add-to-cart-btn:hover {
+    transform: translateY(-3px);
+    background-color: #a855f7;
+}
+
+.add-to-cart-btn:active {
+    transform: translateY(1px);
+}
+
+.category {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0;
+}

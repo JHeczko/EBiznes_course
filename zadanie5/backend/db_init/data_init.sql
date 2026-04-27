@@ -1,18 +1,18 @@
--- Kompletny cykl testu
+-- Full reset
 PRAGMA foreign_keys = OFF;
 DROP TABLE IF EXISTS Basket;
 DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS ProductsPage;
+DROP TABLE IF EXISTS Products;
 DROP TABLE IF EXISTS Category;
 PRAGMA foreign_keys = ON;
 
--- 1. Kategorie
+-- 1. Categories
 CREATE TABLE Category (
     CategoryID INTEGER PRIMARY KEY AUTOINCREMENT, 
     CategoryName TEXT UNIQUE
 );
 
--- 2. Produkty
+-- 2. Products
 CREATE TABLE Products (
     ProductID INTEGER PRIMARY KEY AUTOINCREMENT,
     ProductName TEXT UNIQUE, 
@@ -21,14 +21,14 @@ CREATE TABLE Products (
     FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- 3. Użytkownicy (Dodane!)
+-- 3. Users (unchanged)
 CREATE TABLE Users (
     UserID INTEGER PRIMARY KEY AUTOINCREMENT, 
     UserName TEXT UNIQUE,
     Email TEXT
 );
 
--- 4. Koszyk (Poprawiony klucz obcy!)
+-- 4. Basket
 CREATE TABLE Basket (
     ID INTEGER PRIMARY KEY AUTOINCREMENT, 
     UserID INTEGER, 
@@ -40,31 +40,87 @@ CREATE TABLE Basket (
 
 CREATE UNIQUE INDEX idx_user_product on Basket(UserID, ProductID);
 
--- WSTAWIANIE DANYCH --
+-- 5. Payments
+CREATE TABLE Payments (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER,
+    TotalAmount REAL,
+    Status TEXT,
+    CreatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(UserID) REFERENCES Users(UserID) ON DELETE SET NULL ON UPDATE CASCADE
+);
 
--- Kategorie
+-- ===== DATA =====
+
+-- Categories (furniture)
 INSERT INTO Category (CategoryName) VALUES 
-('Elektronika'), ('Dom i Ogród'), ('Sport i Turystyka'), 
-('Moda'), ('Książki'), ('Zdrowie i Uroda'), ('Motoryzacja');
+('Sofas & Couches'),
+('Tables & Desks'),
+('Chairs & Armchairs'),
+('Beds'),
+('Wardrobes & Dressers'),
+('Outdoor Furniture'),
+('Shelves & Bookcases'),
+('Kitchen Furniture'),
+('Office Furniture'),
+('Decor & Accessories');
 
--- Produkty
+-- Products
 INSERT INTO Products (ProductName, Price, CategoryID) VALUES 
-('Smartfon Galaxy', 2999.99, 1), ('Laptop Pro', 5499.00, 1), ('Słuchawki BT', 199.50, 1),
-('Wiertarka Akumulatorowa', 450.00, 2), ('Lampa Stojąca', 120.00, 2),
-('Namiot 3-osobowy', 600.00, 3), ('Rower Górski', 2100.00, 3),
-('Koszulka Bawełniana', 49.99, 4), ('Jeansy Slim', 129.00, 4),
-('Wiedźmin: Ostatnie Życzenie', 39.90, 5), ('Finansowy Ninja', 69.00, 5),
-('Krem Nawilżający', 28.50, 6), ('Olej Silnikowy 5W30', 160.00, 7);
+-- Sofas
+('3-Seater Sofa Oslo', 2499.99, 1),
+('Corner Sofa Milano', 3999.00, 1),
+('Sofa Bed Luna', 1899.50, 1),
 
--- 5. Dodawanie Userów
+-- Tables
+('Oak Dining Table Classic', 1299.00, 2),
+('Gaming Desk RGB', 899.99, 2),
+('Extendable Table Family', 1599.00, 2),
+
+-- Chairs
+('Wooden Chair Nordic', 199.99, 3),
+('Office Chair ErgoPro', 799.00, 3),
+('Velvet Armchair Comfort', 999.00, 3),
+
+-- Beds
+('King Size Bed Dream', 2999.00, 4),
+('Storage Bed SmartSleep', 1899.00, 4),
+('Kids Bed Bunny', 799.00, 4),
+
+-- Wardrobes
+('Sliding Wardrobe Modern', 2199.00, 5),
+('6-Drawer Dresser Simple', 899.00, 5),
+('Nightstand Mini', 199.00, 5),
+
+-- Outdoor
+('Rattan Garden Set', 1499.00, 6),
+('Wooden Sun Lounger Relax', 399.00, 6),
+('Patio Table Outdoor', 699.00, 6),
+
+-- Shelves
+('Industrial Shelf Loft', 599.00, 7),
+('Wall Shelf Cube', 149.00, 7),
+('Classic Bookcase', 899.00, 7),
+
+-- Kitchen
+('Kitchen Cabinet Basic', 499.00, 8),
+('Kitchen Island Premium', 1799.00, 8),
+('Compact Kitchen Table', 699.00, 8),
+
+-- Office
+('Corner Desk OfficeMax', 1199.00, 9),
+('Mobile Drawer Unit', 299.00, 9),
+('Conference Chair Simple', 249.00, 9),
+
+-- Decor
+('Wall Mirror Loft', 199.00, 10),
+('Floor Lamp ModernLight', 349.00, 10),
+('Scandinavian Rug Soft', 499.00, 10);
+
+-- Users (unchanged)
 INSERT INTO Users (UserName, Email) VALUES 
 ('Wrex', 'wrex@example.com'),
 ('Jakub', 'jakub@test.pl'),
-('Admin', 'admin@sklep.pl');
+('Admin', 'admin@store.com');
 
--- 6. Dodawanie do Koszyka (Przykładowe zamówienia)
-INSERT INTO Basket (UserID, ProductID, Quantity) VALUES 
-(1, 1, 1), -- Wrex kupuje Smartfona
-(1, 3, 2), -- Wrex kupuje 2 pary słuchawek
-(2, 6, 1), -- Jakub kupuje Namiot
-(2, 10, 1); -- Jakub kupuje Wiedźmina
+-- Basket stays empty
