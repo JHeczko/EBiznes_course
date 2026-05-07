@@ -1,0 +1,134 @@
+/* --- OGÓLNY UKŁAD STRONY --- */
+.cart-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.cart-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    width: 90%;
+    gap: 1.7rem;
+    margin: 0.5rem 1.7rem 1.7rem 1.7rem;
+    padding: 1.7rem;
+    border: 3px dashed #ddd;
+}
+
+/* --- KARTA PRODUKTU --- */
+.cart-item {
+    background-color: #eee;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.item-upper,
+.item-lower {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center; /* Zmienione na center dla lepszego wyrównania */
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* --- KONTROLKA ILOŚCI I INPUT --- */
+.control-quantity {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    width: auto;
+}
+
+.quantity-input {
+    width: 3.5rem;
+    height: 2.5rem;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.quantity-input:focus {
+    border-color: #c084fc;
+    box-shadow: 0 0 0 2px rgba(192, 132, 252, 0.2);
+}
+
+/* Ukrywanie strzałek w input type="number" */
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* --- PRZYCISKI (WSPÓLNE STYLE) --- */
+.quantity-control-button,
+.delete-button,
+.checkout-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.checkout-button {
+    background-color: #c084fc;
+    width: 60%;
+    border-radius: 30px;
+    margin-bottom: 1.7rem;
+}
+
+/* Specyficzne kolory tła */
+.quantity-control-button {
+    background-color: #c084fc;
+}
+
+.delete-button {
+    background-color: #fd4545;
+}
+
+/* Wspólny efekt po najechaniu */
+.quantity-control-button:hover,
+.checkout-button:hover{
+    transform: translateY(-3px);
+    background-color: #a855f7; /* Oba zmieniają się na ten sam fiolet */
+}
+
+.delete-button:hover {
+    transform: translateY(-3px);
+    background-color: #dd0000; /* Oba zmieniają się na ten sam fiolet */
+}
+
+.quantity-control-button:active, .delete-button:active, .checkout-button:active {
+    transform: translateY(1px);
+}
+
