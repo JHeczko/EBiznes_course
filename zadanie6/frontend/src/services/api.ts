@@ -2,7 +2,8 @@ import axios from 'axios';
 import type { Product, Category, Basket, Payments } from "../interfaces/definitions.ts";
 
 // backend
-const API_URL = 'http://127.0.0.1:13000';
+// const API_URL = 'http://127.0.0.1:13000';
+const API_URL = 'https://resemblant-evalyn-nonphonemically.ngrok-free.dev';
 
 // 🔥 axios instance
 const api = axios.create({
