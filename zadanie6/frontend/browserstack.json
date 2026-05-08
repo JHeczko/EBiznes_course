@@ -2,7 +2,7 @@
   "auth": {
 
     "username": "jakubheczko_DiLlJF",
-    "access_key": "A4EyhoFKydc2K7eF4Wej"
+    "access_key": "nCHE1YMxMgrUVFUWyKpN"
   },
   "browsers": [
     {
@@ -30,7 +30,7 @@
     "package_config_options": {}
   },
   "connection_settings": {
-    "local": true,
+    "local": false,
     "local_identifier": null
   },
   "disable_usage_reporting": false
