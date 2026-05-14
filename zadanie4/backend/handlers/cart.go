@@ -195,7 +195,7 @@ func DeleteItem(db *gorm.DB) echo.HandlerFunc {
 			}
 
 			if result.RowsAffected == 0 {
-				return echo.NewHTTPError(404, fmt.Sprintf("No items for user %d. Deleted nothing", userID))
+				return c.String(204, fmt.Sprintf("No items for user %d. Deleted nothing", userID))
 			}
 
 			return c.JSON(200, map[string]interface{}{

@@ -39,7 +39,7 @@ func main() {
 	
 	// CORS middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-    AllowOrigins: []string{"http://localhost:5173"},
+    AllowOrigins: []string{"*"},
     AllowMethods: []string{
         http.MethodGet,
         http.MethodPost,
@@ -50,8 +50,9 @@ func main() {
         echo.HeaderOrigin,
         echo.HeaderContentType,
         echo.HeaderAccept,
+        "ngrok-skip-browser-warning",
     },
-    AllowCredentials: true,
+    AllowCredentials: false,
 	}))
 
 	// products endpoints

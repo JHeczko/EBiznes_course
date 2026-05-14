@@ -106,3 +106,53 @@ Github:
 - 5.0: https://github.com/JHeczko/EBiznes_course/commit/bcad11a61e4c47f4b1cf79478c6aef11b40f2cb3
 
 Demo: https://drive.google.com/file/d/1neAyRBsl3Lgn1oYp4ueiklsIvTuNENni/view?usp=sharing
+
+## Zadanie 6 Testy
+Należy stworzyć 20 przypadków testowych w jednym z rozwiązań:
+
+- Cypress JS (JS)
+- Selenium (Kotlin, Python, Java, JS, Go, Scala)
+
+Testy mają w sumie zawierać minimum 50 asercji (3.5). Mają również
+uruchamiać się na platformie Browserstack (5.0). Proszę pamiętać o
+stworzeniu darmowego konta via https://education.github.com/pack.
+
+- 3.0 Należy stworzyć 20 przypadków testowych w CypressJS lub Selenium (Kotlin, Python, Java, JS, Go, Scala)
+- 3.5 Należy rozszerzyć testy funkcjonalne, aby zawierały minimum 50 asercji
+- 4.0 Należy stworzyć testy jednostkowe do wybranego wcześniejszego projektu z minimum 50 asercjami
+- 4.5 Należy dodać testy API, należy pokryć wszystkie endpointy z minimum jednym scenariuszem negatywnym per endpoint
+- 5.0 Należy uruchomić testy funkcjonalne na Browserstacku
+
+Commits:
+- 3.0: https://github.com/JHeczko/EBiznes_course/commit/da119faa4dd5f990f634610b831eb1896363b010
+- 3.5: https://github.com/JHeczko/EBiznes_course/commit/da119faa4dd5f990f634610b831eb1896363b010
+- 4.0: https://github.com/JHeczko/EBiznes_course/commit/7fde107e61c65b34e09a7b217822b18e3b7e24a0
+- 4.5: https://github.com/JHeczko/EBiznes_course/commit/d6cef3c699b2f45833d2bae11ef4ec0e1cbc3f67
+- 5.0: https://github.com/JHeczko/EBiznes_course/commit/d118d9bcb95264e49c34d1638872bffd0bc2f31a
+
+## Zadanie 7 Sonar
+Należy dodać projekt aplikacji klienckiej oraz serwerowej (jeden
+branch, dwa repozytoria) do Sonara w wersji chmurowej
+(https://sonarcloud.io/). Należy poprawić aplikacje uzyskując 0 bugów,
+0 zapaszków, 0 podatności, 0 błędów bezpieczeństwa. Dodatkowo należy
+dodać widżety sonarowe do README w repozytorium dane projektu z
+wynikami.
+
+- 3.0 Należy dodać litera do odpowiedniego kodu aplikacji serwerowej w hookach gita
+- 3.5 Należy wyeliminować wszystkie bugi w kodzie w Sonarze (kod aplikacji serwerowej)
+- 4.0 Należy wyeliminować wszystkie zapaszki w kodzie w Sonarze (kod aplikacji serwerowej)
+- 4.5 Należy wyeliminować wszystkie podatności oraz błędy bezpieczeństwa w kodzie w Sonarze (kod aplikacji serwerowej)
+- 5.0 Należy wyeliminować wszystkie błędy oraz zapaszki w kodzie aplikacji klienckiej
+
+https://golangci-lint.run/
+
+Repos(tam jest cala historia commitow, jesli chodzi o zmiany w kodzie i usuwanie poszczegolnych bugow):
+- FrontEnd: https://github.com/JHeczko/zadanie7-frontend
+- BackEnd: https://github.com/JHeczko/zadanie7-backend
+
+Commits:
+- 3.0: https://github.com/JHeczko/zadanie7-backend/commit/7f27f8579e9d9e4f9aaff1408380fd222962bf61
+- 3.5: https://github.com/JHeczko/zadanie7-backend/commit/53ea78ac7d6ef06a6468c26e0e79b94b488c8b5f
+- 4.0: https://github.com/JHeczko/zadanie7-backend/commit/53ea78ac7d6ef06a6468c26e0e79b94b488c8b5f
+- 4.5: https://github.com/JHeczko/zadanie7-backend/commit/53ea78ac7d6ef06a6468c26e0e79b94b488c8b5f
+- 5.0: https://github.com/JHeczko/zadanie7-frontend/commit/546f5f0ae78cd79e14419dd913abc7856584a3e0

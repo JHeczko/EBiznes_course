@@ -81,7 +81,7 @@ function CartPage({basket, setBasket}: CartPageProps) {
             <div className="cart-container">
                 {
                     basket.length === 0
-                        ? (<h4>Empty cart :(</h4>)
+                        ? (<h4 className="empty-cart-message">Empty cart :(</h4>)
                         :
                         basket.map((item: Basket) => (
                         <div className="cart-item" key={item.id}>

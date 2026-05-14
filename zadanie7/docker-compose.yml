@@ -5,7 +5,7 @@ networks:
 services:
   backend-service:
     build:
-      context: ./backend
+      context: ./backend-z7
       dockerfile: Dockerfile
     image: jheczko/backend_business_app:latest
     container_name: go-backend-service
@@ -17,7 +17,7 @@ services:
 
   frontend-service:
     build:
-      context: ./frontend
+      context: ./frontend-z7
       dockerfile: Dockerfile
     image: jheczko/frontend_business_app:latest
     container_name: react-frontend-service

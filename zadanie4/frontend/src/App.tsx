@@ -16,9 +16,7 @@ function App() {
     return (
         <>
             <BrowserRouter>
-                <PageHeader
-                    basket={basket}
-                />
+                <PageHeader/>
                 <Toaster
                     position="top-right"
                     reverseOrder={false}
