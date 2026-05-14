@@ -53,8 +53,19 @@ func readBody(t *testing.T, res *http.Response) []byte {
     t.Helper()
     body, err := io.ReadAll(res.Body)
     require.NoError(t, err)
-    defer res.Body.Close()
+    defer func() {
+        if err := res.Body.Close(); err != nil {
+            t.Errorf("failed to close body: %v", err)
+        }
+    }()
     return body
+}
+
+func closeBody(t *testing.T, res *http.Response) {
+    t.Helper()
+    if err := res.Body.Close(); err != nil {
+        t.Errorf("failed to close body: %v", err)
+    }
 }
 
 // ════════════════════════════════════════════
@@ -87,18 +98,19 @@ func TestAPI_GetProducts(t *testing.T) {
 func TestAPI_GetProduct_Found(t *testing.T) {
     res0 := get(t, "/products")
     var arr []map[string]interface{}
-    json.Unmarshal(readBody(t, res0), &arr)
+    require.NoError(t, json.Unmarshal(readBody(t, res0), &arr))
     require.GreaterOrEqual(t, len(arr), 1)
 
-    id := int(arr[0]["id"].(float64))
+    idF, ok := arr[0]["id"].(float64)
+    require.True(t, ok)
+    id := int(idF)
     res := get(t, fmt.Sprintf("/products/%d", id))
-    body := readBody(t, res)
 
     // A7
     assert.Equal(t, 200, res.StatusCode)
 
     var prod map[string]interface{}
-    json.Unmarshal(body, &prod)
+    require.NoError(t, json.Unmarshal(readBody(t, res), &prod))
     // A8
     assert.Equal(t, float64(id), prod["id"])
     // A9
@@ -108,6 +120,7 @@ func TestAPI_GetProduct_Found(t *testing.T) {
 // api-03  get /products/:id – check 404 for ghost product
 func TestAPI_GetProduct_NotFound(t *testing.T) {
     res := get(t, "/products/999999")
+    defer closeBody(t, res)
     // A10
     assert.Equal(t, 404, res.StatusCode)
 }
@@ -115,6 +128,7 @@ func TestAPI_GetProduct_NotFound(t *testing.T) {
 // api-04  get /products/:id – bad id check
 func TestAPI_GetProduct_BadID(t *testing.T) {
     res := get(t, "/products/abc")
+    defer closeBody(t, res)
     // A11
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -122,6 +136,7 @@ func TestAPI_GetProduct_BadID(t *testing.T) {
 // api-05  post /products – 400 if name is empty
 func TestAPI_CreateProduct_MissingName(t *testing.T) {
     res := post(t, "/products?price=100&cat=1")
+    defer closeBody(t, res)
     // A12
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -129,6 +144,7 @@ func TestAPI_CreateProduct_MissingName(t *testing.T) {
 // api-06  post /products – bad price format
 func TestAPI_CreateProduct_BadPrice(t *testing.T) {
     res := post(t, "/products?name=Test&price=abc&cat=1")
+    defer closeBody(t, res)
     // A13
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -136,6 +152,7 @@ func TestAPI_CreateProduct_BadPrice(t *testing.T) {
 // api-07  post /products – bad category id check
 func TestAPI_CreateProduct_BadCat(t *testing.T) {
     res := post(t, "/products?name=Test&price=99.9&cat=abc")
+    defer closeBody(t, res)
     // A14
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -144,9 +161,12 @@ func TestAPI_CreateProduct_BadCat(t *testing.T) {
 func TestAPI_CreateProduct_OK(t *testing.T) {
     res0 := get(t, "/category")
     var cats []map[string]interface{}
-    json.Unmarshal(readBody(t, res0), &cats)
+    require.NoError(t, json.Unmarshal(readBody(t, res0), &cats))
     require.GreaterOrEqual(t, len(cats), 1)
-    catID := int(cats[0]["id"].(float64))
+    
+    catIDVal, ok := cats[0]["id"].(float64)
+    require.True(t, ok)
+    catID := int(catIDVal)
 
     res := post(t, fmt.Sprintf("/products?name=TestProduct&price=299.99&cat=%d", catID))
     body := readBody(t, res)
@@ -154,7 +174,8 @@ func TestAPI_CreateProduct_OK(t *testing.T) {
     assert.Equal(t, 201, res.StatusCode)
 
     var prod map[string]interface{}
-    json.Unmarshal(body, &prod)
+    err := json.Unmarshal(body, &prod)
+    require.NoError(t, err)
     // A16
     assert.Equal(t, "TestProduct", prod["name"])
 }
@@ -162,6 +183,7 @@ func TestAPI_CreateProduct_OK(t *testing.T) {
 // api-09  patch /products/:id – 404 if no product
 func TestAPI_UpdateProduct_NotFound(t *testing.T) {
     res := patch(t, "/products/999999?name=X&price=1&cat=1")
+    defer closeBody(t, res)
     // A17
     assert.Equal(t, 404, res.StatusCode)
 }
@@ -169,6 +191,7 @@ func TestAPI_UpdateProduct_NotFound(t *testing.T) {
 // api-10  patch /products/:id – check 400 for bad data
 func TestAPI_UpdateProduct_BadPrice(t *testing.T) {
     res := patch(t, "/products/1?name=X&price=abc&cat=1")
+    defer closeBody(t, res)
     // A18
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -176,6 +199,7 @@ func TestAPI_UpdateProduct_BadPrice(t *testing.T) {
 // api-11  delete /products/:id – 404 if not exists
 func TestAPI_DeleteProduct_NotFound(t *testing.T) {
     res := del(t, "/products/999999")
+    defer closeBody(t, res)
     // A19
     assert.Equal(t, 404, res.StatusCode)
 }
@@ -183,6 +207,7 @@ func TestAPI_DeleteProduct_NotFound(t *testing.T) {
 // api-12  delete /products/:id – bad format check
 func TestAPI_DeleteProduct_BadID(t *testing.T) {
     res := del(t, "/products/abc")
+    defer closeBody(t, res)
     // A20
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -198,7 +223,8 @@ func TestAPI_GetCategories(t *testing.T) {
     assert.Equal(t, 200, res.StatusCode)
 
     var arr []map[string]interface{}
-    json.Unmarshal(readBody(t, res), &arr)
+    err := json.Unmarshal(readBody(t, res), &arr)
+    require.NoError(t, err)
     // A22
     assert.GreaterOrEqual(t, len(arr), 1)
 }
@@ -206,6 +232,7 @@ func TestAPI_GetCategories(t *testing.T) {
 // api-14  get /category/:id – 404 for missing
 func TestAPI_GetCategory_NotFound(t *testing.T) {
     res := get(t, "/category/999999")
+    defer closeBody(t, res)
     // A23
     assert.Equal(t, 404, res.StatusCode)
 }
@@ -213,6 +240,7 @@ func TestAPI_GetCategory_NotFound(t *testing.T) {
 // api-15  post /category – 400 if no name
 func TestAPI_CreateCategory_MissingName(t *testing.T) {
     res := post(t, "/category")
+    defer closeBody(t, res)
     // A24
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -220,6 +248,7 @@ func TestAPI_CreateCategory_MissingName(t *testing.T) {
 // api-16  patch /category/:id – 404 check
 func TestAPI_UpdateCategory_NotFound(t *testing.T) {
     res := patch(t, "/category/999999?name=X")
+    defer closeBody(t, res)
     // A25
     assert.Equal(t, 404, res.StatusCode)
 }
@@ -227,6 +256,7 @@ func TestAPI_UpdateCategory_NotFound(t *testing.T) {
 // api-17  patch /category/:id – bad id test
 func TestAPI_UpdateCategory_BadID(t *testing.T) {
     res := patch(t, "/category/abc?name=X")
+    defer closeBody(t, res)
     // A26
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -234,6 +264,7 @@ func TestAPI_UpdateCategory_BadID(t *testing.T) {
 // api-18  delete /category/:id – 404 if ghost cat
 func TestAPI_DeleteCategory_NotFound(t *testing.T) {
     res := del(t, "/category/999999")
+    defer closeBody(t, res)
     // A27
     assert.Equal(t, 404, res.StatusCode)
 }
@@ -249,7 +280,8 @@ func TestAPI_GetCart(t *testing.T) {
     assert.Equal(t, 200, res.StatusCode)
 
     var arr []interface{}
-    json.Unmarshal(readBody(t, res), &arr)
+    err := json.Unmarshal(readBody(t, res), &arr)
+    require.NoError(t, err)
     // A29
     assert.IsType(t, []interface{}{}, arr)
 }
@@ -257,6 +289,7 @@ func TestAPI_GetCart(t *testing.T) {
 // api-20  get /cart/:user_id – 400 for bad user id
 func TestAPI_GetCart_BadUserID(t *testing.T) {
     res := get(t, "/cart/xyz")
+    defer closeBody(t, res)
     // A30
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -264,6 +297,7 @@ func TestAPI_GetCart_BadUserID(t *testing.T) {
 // api-21  post /cart/:user_id – 400 if no prod id
 func TestAPI_CreateCartItem_MissingProdID(t *testing.T) {
     res := post(t, "/cart/1")
+    defer closeBody(t, res)
     // A31
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -271,6 +305,7 @@ func TestAPI_CreateCartItem_MissingProdID(t *testing.T) {
 // api-22  post /cart/:user_id – check bad prod id format
 func TestAPI_CreateCartItem_BadProdID(t *testing.T) {
     res := post(t, "/cart/1?prod_id=abc")
+    defer closeBody(t, res)
     // A32
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -278,6 +313,7 @@ func TestAPI_CreateCartItem_BadProdID(t *testing.T) {
 // api-23  patch /cart/:user_id – 400 if no prod id
 func TestAPI_UpdateCartItem_MissingProdID(t *testing.T) {
     res := patch(t, "/cart/1?quantity=3")
+    defer closeBody(t, res)
     // A33
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -285,6 +321,7 @@ func TestAPI_UpdateCartItem_MissingProdID(t *testing.T) {
 // api-24  patch /cart/:user_id – bad quantity format
 func TestAPI_UpdateCartItem_BadQuantity(t *testing.T) {
     res := patch(t, "/cart/1?prod_id=1&quantity=abc")
+    defer closeBody(t, res)
     // A34
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -292,6 +329,7 @@ func TestAPI_UpdateCartItem_BadQuantity(t *testing.T) {
 // api-25  patch /cart/:user_id – 404 if item not in cart
 func TestAPI_UpdateCartItem_ProdNotInCart(t *testing.T) {
     res := patch(t, "/cart/1?prod_id=999999&quantity=1")
+    defer closeBody(t, res)
     // A35
     assert.Equal(t, 404, res.StatusCode)
 }
@@ -299,6 +337,7 @@ func TestAPI_UpdateCartItem_ProdNotInCart(t *testing.T) {
 // api-26  delete /cart/:user_id – check bad user id
 func TestAPI_DeleteCartItem_BadUserID(t *testing.T) {
     res := del(t, "/cart/abc")
+    defer closeBody(t, res)
     // A36
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -306,6 +345,7 @@ func TestAPI_DeleteCartItem_BadUserID(t *testing.T) {
 // api-27  delete /cart/:user_id – 404 if cart empty
 func TestAPI_DeleteCart_EmptyUser(t *testing.T) {
     res := del(t, "/cart/888888")
+    defer closeBody(t, res)
     // A37
     assert.Equal(t, 404, res.StatusCode)
 }
@@ -321,7 +361,8 @@ func TestAPI_GetPayments(t *testing.T) {
     assert.Equal(t, 200, res.StatusCode)
 
     var arr []interface{}
-    json.Unmarshal(readBody(t, res), &arr)
+    err := json.Unmarshal(readBody(t, res), &arr)
+    require.NoError(t, err)
     // A39
     assert.IsType(t, []interface{}{}, arr)
 }
@@ -329,6 +370,7 @@ func TestAPI_GetPayments(t *testing.T) {
 // api-29  get /payments/:user_id – bad user id check
 func TestAPI_GetPayments_BadUserID(t *testing.T) {
     res := get(t, "/payments/abc")
+    defer closeBody(t, res)
     // A40
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -336,6 +378,7 @@ func TestAPI_GetPayments_BadUserID(t *testing.T) {
 // api-30  post /payments/:user_id – 500 if nothing to pay for
 func TestAPI_AddPayment_EmptyBasket(t *testing.T) {
     res := post(t, "/payments/777777")
+    defer closeBody(t, res)
     // A41
     assert.Equal(t, 500, res.StatusCode)
 }
@@ -343,6 +386,7 @@ func TestAPI_AddPayment_EmptyBasket(t *testing.T) {
 // api-31  post /payments/:user_id – 400 for bad id
 func TestAPI_AddPayment_BadUserID(t *testing.T) {
     res := post(t, "/payments/abc")
+    defer closeBody(t, res)
     // A42
     assert.Equal(t, 400, res.StatusCode)
 }
@@ -355,7 +399,8 @@ func TestAPI_AddPayment_BadUserID(t *testing.T) {
 func TestAPI_ProductHasCategory(t *testing.T) {
     res := get(t, "/products")
     var arr []map[string]interface{}
-    json.Unmarshal(readBody(t, res), &arr)
+    err := json.Unmarshal(readBody(t, res), &arr)
+    require.NoError(t, err)
     require.GreaterOrEqual(t, len(arr), 1)
 
     cat, ok := arr[0]["category"].(map[string]interface{})
@@ -371,16 +416,22 @@ func TestAPI_ProductHasCategory(t *testing.T) {
 func TestAPI_CartItemHasProduct(t *testing.T) {
     res0 := get(t, "/products")
     var products []map[string]interface{}
-    json.Unmarshal(readBody(t, res0), &products)
+    err := json.Unmarshal(readBody(t, res0), &products)
+    require.NoError(t, err)
     if len(products) == 0 {
        t.Skip("No products in db")
     }
-    prodID := int(products[0]["id"].(float64))
-    post(t, fmt.Sprintf("/cart/1?prod_id=%d&quantity=1", prodID))
+    
+    prodIDF, ok := products[0]["id"].(float64)
+    require.True(t, ok)
+    prodID := int(prodIDF)
+    resPost := post(t, fmt.Sprintf("/cart/1?prod_id=%d&quantity=1", prodID))
+    closeBody(t, resPost)
 
     res := get(t, "/cart/1")
     var arr []map[string]interface{}
-    json.Unmarshal(readBody(t, res), &arr)
+    err = json.Unmarshal(readBody(t, res), &arr)
+    require.NoError(t, err)
 
     if len(arr) == 0 {
        t.Skip("Cart is empty - skip")

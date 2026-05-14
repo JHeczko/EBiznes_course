@@ -41,20 +41,20 @@ func setupTestDB(t *testing.T) *gorm.DB {
     return db
 }
 
-func seedData(db *gorm.DB) {
+func seedData(t *testing.T, db *gorm.DB) {
     cat := models.Category{CategoryName: "Furnitures"}
-    db.Create(&cat)
+    require.NoError(t, db.Create(&cat).Error)
 
     catID := cat.CategoryID
     p1 := models.Product{ProductName: "Couch", Price: 1500.00, CategoryID: &catID}
     p2 := models.Product{ProductName: "Chair", Price: 150.00, CategoryID: &catID}
-    db.Create(&p1)
-    db.Create(&p2)
+    require.NoError(t, db.Create(&p1).Error)
+    require.NoError(t, db.Create(&p2).Error)
 
     user := models.Users{UserName: "testuser", Email: "test@example.com"}
-    db.Create(&user)
+    require.NoError(t, db.Create(&user).Error)
 
-    db.Create(&models.Basket{UserID: user.UserID, ProductID: p1.ProductID, Quantity: 2})
+    require.NoError(t, db.Create(&models.Basket{UserID: user.UserID, ProductID: p1.ProductID, Quantity: 2}).Error)
 }
 
 func echoCtx(method, path string) (echo.Context, *httptest.ResponseRecorder) {
@@ -69,7 +69,7 @@ func echoCtx(method, path string) (echo.Context, *httptest.ResponseRecorder) {
 // ─────────────────────────────────────────────
 func TestGetCategories_ReturnsOK(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     c, rec := echoCtx(http.MethodGet, "/category")
 
@@ -80,7 +80,8 @@ func TestGetCategories_ReturnsOK(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var cats []models.Category
-    json.Unmarshal(rec.Body.Bytes(), &cats)
+    err = json.Unmarshal(rec.Body.Bytes(), &cats)
+    require.NoError(t, err)
     // A3
     assert.GreaterOrEqual(t, len(cats), 1)
     // A4
@@ -92,14 +93,14 @@ func TestGetCategories_ReturnsOK(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestGetCategory_ExistingID(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     var cat models.Category
-    db.First(&cat)
+    require.NoError(t, db.First(&cat).Error)
 
-    c, rec := echoCtx(http.MethodGet, "/category/"+fmt.Sprint(cat.CategoryID))
+    c, rec := echoCtx(http.MethodGet, "/category/"+fmt.Sprintf("%d", cat.CategoryID))
     c.SetParamNames("id")
-    c.SetParamValues(fmt.Sprint(cat.CategoryID))
+    c.SetParamValues(fmt.Sprintf("%d", cat.CategoryID))
 
     err := GetCategory(db)(c)
     // A5
@@ -108,7 +109,8 @@ func TestGetCategory_ExistingID(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var result models.Category
-    json.Unmarshal(rec.Body.Bytes(), &result)
+    err = json.Unmarshal(rec.Body.Bytes(), &result)
+    require.NoError(t, err)
     // A7
     assert.Equal(t, cat.CategoryID, result.CategoryID)
     // A8
@@ -171,7 +173,8 @@ func TestCreateCategory_OK(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var cat models.Category
-    json.Unmarshal(rec.Body.Bytes(), &cat)
+    err = json.Unmarshal(rec.Body.Bytes(), &cat)
+    require.NoError(t, err)
     // A16
     assert.Equal(t, "Sleepingroom", cat.CategoryName)
     // A17
@@ -202,7 +205,7 @@ func TestCreateCategory_MissingName(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestGetProducts_ReturnsOK(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     c, rec := echoCtx(http.MethodGet, "/products")
 
@@ -213,7 +216,8 @@ func TestGetProducts_ReturnsOK(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var products []models.Product
-    json.Unmarshal(rec.Body.Bytes(), &products)
+    err = json.Unmarshal(rec.Body.Bytes(), &products)
+    require.NoError(t, err)
     // A22
     assert.GreaterOrEqual(t, len(products), 2)
 }
@@ -223,14 +227,14 @@ func TestGetProducts_ReturnsOK(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestGetProduct_ExistingID(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     var prod models.Product
-    db.First(&prod)
+    require.NoError(t, db.First(&prod).Error)
 
-    c, rec := echoCtx(http.MethodGet, "/products/"+fmt.Sprint(prod.ProductID))
+    c, rec := echoCtx(http.MethodGet, "/products/"+fmt.Sprintf("%d", prod.ProductID))
     c.SetParamNames("id")
-    c.SetParamValues(fmt.Sprint(prod.ProductID))
+    c.SetParamValues(fmt.Sprintf("%d", prod.ProductID))
 
     err := GetProduct(db)(c)
     // A23
@@ -239,7 +243,8 @@ func TestGetProduct_ExistingID(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var result models.Product
-    json.Unmarshal(rec.Body.Bytes(), &result)
+    err = json.Unmarshal(rec.Body.Bytes(), &result)
+    require.NoError(t, err)
     // A25
     assert.Equal(t, prod.ProductID, result.ProductID)
     // A26
@@ -289,14 +294,14 @@ func TestGetProduct_BadID(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestGetItems_ExistingUser(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     var user models.Users
-    db.First(&user)
+    require.NoError(t, db.First(&user).Error)
 
-    c, rec := echoCtx(http.MethodGet, "/cart/"+fmt.Sprint(user.UserID))
+    c, rec := echoCtx(http.MethodGet, "/cart/"+fmt.Sprintf("%d", user.UserID))
     c.SetParamNames("user_id")
-    c.SetParamValues(fmt.Sprint(user.UserID))
+    c.SetParamValues(fmt.Sprintf("%d", user.UserID))
 
     err := GetItems(db)(c)
     // A32
@@ -305,7 +310,8 @@ func TestGetItems_ExistingUser(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var items []models.Basket
-    json.Unmarshal(rec.Body.Bytes(), &items)
+    err = json.Unmarshal(rec.Body.Bytes(), &items)
+    require.NoError(t, err)
     // A34
     assert.Equal(t, 1, len(items))
     // A35
@@ -335,12 +341,12 @@ func TestGetItems_BadUserID(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestCreateItem_NewEntry(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     var user models.Users
-    db.First(&user)
+    require.NoError(t, db.First(&user).Error)
     var prod models.Product
-    db.Where("ProductName = ?", "Chair").First(&prod)
+    require.NoError(t, db.Where("ProductName = ?", "Chair").First(&prod).Error)
 
     e := echo.New()
     req := httptest.NewRequest(http.MethodPost,
@@ -348,7 +354,7 @@ func TestCreateItem_NewEntry(t *testing.T) {
     rec := httptest.NewRecorder()
     c := e.NewContext(req, rec)
     c.SetParamNames("user_id")
-    c.SetParamValues(fmt.Sprint(user.UserID))
+    c.SetParamValues(fmt.Sprintf("%d", user.UserID))
 
     err := CreateItem(db)(c)
     // A38
@@ -357,7 +363,8 @@ func TestCreateItem_NewEntry(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var item models.Basket
-    json.Unmarshal(rec.Body.Bytes(), &item)
+    err = json.Unmarshal(rec.Body.Bytes(), &item)
+    require.NoError(t, err)
     // A40
     assert.Equal(t, uint(3), item.Quantity)
     // A41
@@ -369,7 +376,7 @@ func TestCreateItem_NewEntry(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestCreateItem_BadProdID(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     e := echo.New()
     req := httptest.NewRequest(http.MethodPost, "/cart/1?prod_id=abc", nil)
@@ -391,14 +398,14 @@ func TestCreateItem_BadProdID(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestDeleteItem_AllItems(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     var user models.Users
-    db.First(&user)
+    require.NoError(t, db.First(&user).Error)
 
-    c, rec := echoCtx(http.MethodDelete, "/cart/"+fmt.Sprint(user.UserID))
+    c, rec := echoCtx(http.MethodDelete, "/cart/"+fmt.Sprintf("%d", user.UserID))
     c.SetParamNames("user_id")
-    c.SetParamValues(fmt.Sprint(user.UserID))
+    c.SetParamValues(fmt.Sprintf("%d", user.UserID))
 
     err := DeleteItem(db)(c)
     // A44
@@ -407,12 +414,13 @@ func TestDeleteItem_AllItems(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var response map[string]interface{}
-    json.Unmarshal(rec.Body.Bytes(), &response)
+    err = json.Unmarshal(rec.Body.Bytes(), &response)
+    require.NoError(t, err)
     // A46
     assert.Equal(t, "all", response["type"])
 
     var remaining []models.Basket
-    db.Where("UserID = ?", user.UserID).Find(&remaining)
+    require.NoError(t, db.Where("UserID = ?", user.UserID).Find(&remaining).Error)
     // A47
     assert.Equal(t, 0, len(remaining))
 }
@@ -422,14 +430,14 @@ func TestDeleteItem_AllItems(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestGetPayments_ReturnsOK(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     var user models.Users
-    db.First(&user)
+    require.NoError(t, db.First(&user).Error)
 
-    c, rec := echoCtx(http.MethodGet, "/payments/"+fmt.Sprint(user.UserID))
+    c, rec := echoCtx(http.MethodGet, "/payments/"+fmt.Sprintf("%d", user.UserID))
     c.SetParamNames("user_id")
-    c.SetParamValues(fmt.Sprint(user.UserID))
+    c.SetParamValues(fmt.Sprintf("%d", user.UserID))
 
     err := GetPayments(db)(c)
     // A48
@@ -438,7 +446,8 @@ func TestGetPayments_ReturnsOK(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var payments []models.Payments
-    json.Unmarshal(rec.Body.Bytes(), &payments)
+    err = json.Unmarshal(rec.Body.Bytes(), &payments)
+    require.NoError(t, err)
     // A50
     assert.IsType(t, []models.Payments{}, payments)
 }
@@ -466,7 +475,7 @@ func TestGetPayments_BadUserID(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestAddPayment_EmptyBasket(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     c, _ := echoCtx(http.MethodPost, "/payments/9999")
     c.SetParamNames("user_id")
@@ -485,10 +494,10 @@ func TestAddPayment_EmptyBasket(t *testing.T) {
 // ─────────────────────────────────────────────
 func TestUpdateCategory_OK(t *testing.T) {
     db := setupTestDB(t)
-    seedData(db)
+    seedData(t, db)
 
     var cat models.Category
-    db.First(&cat)
+    require.NoError(t, db.First(&cat).Error)
 
     e := echo.New()
     req := httptest.NewRequest(http.MethodPatch,
@@ -496,7 +505,7 @@ func TestUpdateCategory_OK(t *testing.T) {
     rec := httptest.NewRecorder()
     c := e.NewContext(req, rec)
     c.SetParamNames("id")
-    c.SetParamValues(fmt.Sprint(cat.CategoryID))
+    c.SetParamValues(fmt.Sprintf("%d", cat.CategoryID))
 
     err := UpdateCategory(db)(c)
     // A55
@@ -505,7 +514,7 @@ func TestUpdateCategory_OK(t *testing.T) {
     assert.Equal(t, http.StatusOK, rec.Code)
 
     var updated models.Category
-    db.First(&updated, cat.CategoryID)
+    require.NoError(t, db.First(&updated, cat.CategoryID).Error)
     // A57
     assert.Equal(t, "NewCat", updated.CategoryName)
 }
@@ -516,11 +525,11 @@ func TestUpdateCategory_OK(t *testing.T) {
 func TestDeleteCategory_OK(t *testing.T) {
     db := setupTestDB(t)
     cat := models.Category{CategoryName: "ToDelete"}
-    db.Create(&cat)
+    require.NoError(t, db.Create(&cat).Error)
 
-    c, rec := echoCtx(http.MethodDelete, "/category/"+fmt.Sprint(cat.CategoryID))
+    c, rec := echoCtx(http.MethodDelete, "/category/"+fmt.Sprintf("%d", cat.CategoryID))
     c.SetParamNames("id")
-    c.SetParamValues(fmt.Sprint(cat.CategoryID))
+    c.SetParamValues(fmt.Sprintf("%d", cat.CategoryID))
 
     err := DeleteCategory(db)(c)
     // A58

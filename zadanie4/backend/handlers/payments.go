@@ -10,18 +10,16 @@ import (
 
 func GetPayments(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userID_conv, err_conv := strconv.Atoi(c.Param("user_id"))
-		if err_conv != nil {
-			c.Logger().Errorf("UserID conversion failed: %v", err_conv)
+		userIDConv, err := strconv.Atoi(c.Param("user_id"))
+		if err != nil {
+			c.Logger().Errorf(errUserIDConv, err)
 			return echo.NewHTTPError(400, "Invalid User ID format")
 		}
-		userID := uint(userID_conv)
+		userID := uint(userIDConv)
 
 		var payments []models.Payments
 
-		err := db.Table("Payments").Scopes(models.ByUserID(userID)).Find(&payments).Error
-
-		if err != nil {
+		if err := db.Table("Payments").Scopes(models.ByUserID(userID)).Find(&payments).Error; err != nil {
 			c.Logger().Errorf("Couldn't get payments: %v", err)
 			return echo.NewHTTPError(500, "Couldn't get payments")
 		}
@@ -32,23 +30,20 @@ func GetPayments(db *gorm.DB) echo.HandlerFunc {
 
 func AddPayment(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-
-		userID_conv, err_conv := strconv.Atoi(c.Param("user_id"))
-		if err_conv != nil {
-			c.Logger().Errorf("UserID conversion failed: %v", err_conv)
+		userIDConv, err := strconv.Atoi(c.Param("user_id"))
+		if err != nil {
+			c.Logger().Errorf(errUserIDConv, err)
 			return echo.NewHTTPError(400, "Invalid User ID format")
 		}
-		userID := uint(userID_conv)
+		userID := uint(userIDConv)
 
 		var total float64
-		err := db.Scopes(models.SumBasketForUserID(userID)).Scan(&total).Error
-		if err != nil {
+		if err := db.Scopes(models.SumBasketForUserID(userID)).Scan(&total).Error; err != nil {
 			c.Logger().Errorf("Basket sum failed: %v", err)
 			return echo.NewHTTPError(500, "Cannot calculate basket total")
 		}
 
-		if total==0{
-			c.Logger().Errorf("Cannot pay for empty basket: %v", err)
+		if total == 0 {
 			return echo.NewHTTPError(500, "Cannot pay for empty basket. Total == 0")
 		}
 
@@ -58,13 +53,11 @@ func AddPayment(db *gorm.DB) echo.HandlerFunc {
 			Status:      "paid",
 		}
 
-		err = db.Create(&payment).Error
-		if err != nil {
+		if err := db.Create(&payment).Error; err != nil {
 			c.Logger().Errorf("Payment create failed: %v", err)
 			return echo.NewHTTPError(500, "Cannot create payment")
 		}
 
-		// 3. response
 		return c.JSON(200, payment)
 	}
 }

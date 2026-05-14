@@ -6,18 +6,7 @@
     width: 100%;
 }
 
-/*.product-container {*/
-/*    display: flex;*/
-/*    flex-wrap: wrap;*/
-/*    justify-content: left;*/
-/*    gap: 20px;*/
-
-/*    width: 90%;*/
-/*    max-width: 1300px;*/
-/*    margin: 0 auto;*/
-/*}*/
-
-.product-container{
+.product-container {
     display: grid;
     grid-template-columns: 1fr;
     align-items: center;
@@ -28,7 +17,7 @@
     margin: 0 auto 1.7rem;
 }
 
-.card-info{
+.card-info {
     display: flex;
     flex-direction: column;
     align-items: start;
@@ -38,21 +27,20 @@
 .product-card {
     background-color: #eee;
     display: flex;
-    flex-direction: column; /* Układ pionowy */
-    /*width: 70rem;*/
-    width: 100%;                /* Karta zajmuje całą szerokość kolumny */
+    flex-direction: column;
+    width: 100%;
     height: 14rem;
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 20px;
-    box-sizing: border-box; /* Ważne, żeby padding nie rozwalał wymiarów */
+    box-sizing: border-box;
 }
 
 .card-footer {
-    margin-top: auto;      /* Popycha całą stopkę na sam dół karty */
-    display: flex;         /* Ustawia cenę i guzik obok siebie */
-    justify-content: space-between; /* Cena na lewo, guzik na prawo */
-    align-items: flex-end; /* Wyrównuje je do dołu wewnątrz stopki */
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
     width: 100%;
 }
 
@@ -63,26 +51,42 @@
 }
 
 .add-to-cart-btn {
-    background-color: #c084fc;
+    /* Reset stylów natywnego buttona */
+    border: none;
+    outline: none;
+    font-family: inherit;
+    
+    /* Twoje style */
+    background-color: #9333ea; 
     color: white;
     padding: 10px 25px;
     border-radius: 30px;
     cursor: pointer;
     font-weight: bold;
     transition: background 0.2s, transform 0.2s;
+    
+    /* Wyśrodkowanie tekstu wewnątrz buttona */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .add-to-cart-btn:hover {
     transform: translateY(-3px);
-    background-color: #a855f7;
+    background-color: #7e22ce;
 }
 
 .add-to-cart-btn:active {
     transform: translateY(1px);
 }
 
+.add-to-cart-btn:focus-visible {
+    outline: 2px solid #a855f7;
+    outline-offset: 2px;
+}
+
 .category {
-    color: #666;
+    color: #4b5563;
     font-size: 0.9rem;
     margin-top: 0;
 }

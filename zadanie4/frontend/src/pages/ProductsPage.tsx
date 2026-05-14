@@ -1,4 +1,4 @@
-import type {Category, Product} from "../interfaces/definitions.ts";
+import type {Product} from "../interfaces/definitions.ts";
 import * as React from "react";
 import {addToBasket, getProducts} from "../services/api.ts";
 
@@ -9,11 +9,11 @@ import toast from "react-hot-toast";
 type ProductsPageParams = {
     products: Product[];
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
-    categories: Category[];
-    setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+    //categories: Category[];
+    //setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
 }
 
-function ProductsPage({products, setProducts}: ProductsPageParams) {
+function ProductsPage({products, setProducts}: Readonly<ProductsPageParams>) {
     useEffect(() => {
         const init_data = async () =>{
             const data = await getProducts();
@@ -52,9 +52,16 @@ function ProductsPage({products, setProducts}: ProductsPageParams) {
                         {/* DÓŁ: Cena i guzik (to musi być razem!) */}
                         <div className="card-footer">
                             <div className="price-tag">{product.price} zł</div>
-                            <div className="add-to-cart-btn" onClick={() => addItemToBasket(product)}>
+                            {/* <div className="add-to-cart-btn" onClick={() => addItemToBasket(product)}>
                                 Dodaj
-                            </div>
+                            </div> */}
+                            <button 
+                                type="button" 
+                                className="add-to-cart-btn" 
+                                onClick={() => addItemToBasket(product)}
+                            >
+                                Dodaj do koszyka
+                            </button>
                         </div>
                     </div>
                 ))}

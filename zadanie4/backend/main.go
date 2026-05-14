@@ -18,7 +18,7 @@ import (
 func main() {
 	// databse init
 	//db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
-	db, err := gorm.Open(sqlite.Open("/root/app/database.db"), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open("/home/appuser/app/database.db"), &gorm.Config{
 		Logger: logger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags),
 			logger.Config{
@@ -75,19 +75,21 @@ func main() {
 		categoryEndpoints.DELETE("/:id", handlers.DeleteCategory(db))
 	}
 
+	userEndpoint := "/:user_id"
+
 	cartEndpoints := e.Group("/cart")
 	{
-		cartEndpoints.GET("/:user_id", handlers.GetItems(db))
-		cartEndpoints.POST("/:user_id", handlers.CreateItem(db))
-		cartEndpoints.PATCH("/:user_id", handlers.UpdateItem(db))
-		cartEndpoints.DELETE("/:user_id", handlers.DeleteItem(db))
+		cartEndpoints.GET(userEndpoint, handlers.GetItems(db))
+		cartEndpoints.POST(userEndpoint, handlers.CreateItem(db))
+		cartEndpoints.PATCH(userEndpoint, handlers.UpdateItem(db))
+		cartEndpoints.DELETE(userEndpoint, handlers.DeleteItem(db))
 	}
 
 	paymentsEndpoints := e.Group("/payments")
 
 	{
-		paymentsEndpoints.GET("/:user_id", handlers.GetPayments(db))
-		paymentsEndpoints.POST("/:user_id", handlers.AddPayment(db))
+		paymentsEndpoints.GET(userEndpoint, handlers.GetPayments(db))
+		paymentsEndpoints.POST(userEndpoint, handlers.AddPayment(db))
 	}
 
 	e.Logger.Fatal(e.Start(":13000"))
