@@ -6,6 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"time"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type AuthRequest struct {
@@ -43,6 +45,9 @@ func Register(db *gorm.DB) echo.HandlerFunc {
 }
 
 // 3.0 Logowanie
+// Klucz trzymaj w zmiennej środowiskowej w produkcji!
+var jwtKey = []byte("super_tajny_klucz_123") 
+
 func Login(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := new(AuthRequest)
@@ -51,20 +56,34 @@ func Login(db *gorm.DB) echo.HandlerFunc {
 		}
 
 		var user models.Users
-		// Szukamy użytkownika lokalnego po emailu
-		if err := db.Where("Email = ? AND Provider = ?", req.Email, "local").First(&user).Error; err != nil {
+		// 1. Znajdź usera
+		if err := db.Where("email = ? AND provider = ?", req.Email, "local").First(&user).Error; err != nil {
 			return c.JSON(http.StatusUnauthorized, echo.Map{"error": "Invalid email or password"})
 		}
 
-		// Weryfikacja hasła
+		// 2. Weryfikacja hasła
 		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 			return c.JSON(http.StatusUnauthorized, echo.Map{"error": "Invalid email or password"})
 		}
 
-		// Tu w przyszłości wstawisz JWT - teraz tylko info, że zalogowany
-		return c.JSON(http.StatusOK, echo.Map{
-			"message": "Login successful", 
+		// 3. Generowanie JWT
+		expirationTime := time.Now().Add(24 * time.Hour)
+		claims := jwt.MapClaims{
 			"user_id": user.UserID,
+			"exp":     expirationTime.Unix(),
+		}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		tokenString, err := token.SignedString(jwtKey)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Could not create token"})
+		}
+
+		// 4. Odpowiedź z tokenem
+		return c.JSON(http.StatusOK, echo.Map{
+			"message": "Login successful",
+			"user_id": user.UserID,
+			"token":   tokenString,
 		})
 	}
 }

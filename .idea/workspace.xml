@@ -5,22 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3640023e-3e1b-41bd-817c-0b7c847b20b4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/.dockerignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/api_tests/test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/database.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/db_init/data_init.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/db_start.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/go.mod" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/go.sum" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/handlers/cart.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/handlers/categories.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/handlers/handlers_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/handlers/payments.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/handlers/products.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/models/models.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zadanie8/backend/models/scopes.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
@@ -34,8 +18,8 @@
       <list>
         <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
-        <option value="CSS File" />
         <option value="Dockerfile" />
+        <option value="CSS File" />
       </list>
     </option>
   </component>
@@ -45,9 +29,6 @@
   </component>
   <component name="NamedScopeManager">
     <scope name="FrontEnd_scope" pattern="(file[EBiznes_course]:zadanie4/*||file[EBiznes_course]:zadanie4/frontend/*||file[EBiznes_course]:zadanie4/frontend/src/*||file[EBiznes_course]:zadanie4/frontend/public/*||file[EBiznes_course]:zadanie4/frontend/src//*)&amp;&amp;!file[EBiznes_course]:zadanie4/backend/*&amp;&amp;!file[EBiznes_course]:zadanie4/backend//*||file[EBiznes_course]:zadanie4/frontend//*" />
-  </component>
-  <component name="PackageJsonUpdateNotifier">
-    <dismissed value="$PROJECT_DIR$/zadanie4/frontend/package.json" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="ProjectErrors" />
@@ -125,7 +106,7 @@
       <workItem from="1778777216543" duration="3130000" />
       <workItem from="1778927248279" duration="22000" />
       <workItem from="1779527992443" duration="803000" />
-      <workItem from="1779547813232" duration="1996000" />
+      <workItem from="1779547813232" duration="4109000" />
     </task>
     <servers />
   </component>

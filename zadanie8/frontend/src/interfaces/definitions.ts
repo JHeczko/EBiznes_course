@@ -47,5 +47,5 @@ export interface DeleteResponse{
 export interface AuthResponse {
     message: string;
     user_id: number;
-    token?: string; // JWT dodamy w punkcie 5.0
+    token: string;
 }

@@ -178,3 +178,7 @@ uri)-react.
 Klucz należy uzyskać na:
 - https://console.cloud.google.com/apis/dashboard,
 - https://developers.facebook.com/
+
+Commits:
+- 3.0: https://github.com/JHeczko/EBiznes_course/commit/0c2ce2692e853475229cc8b315ec2e27f9c7ff0e
+- 3.5: 

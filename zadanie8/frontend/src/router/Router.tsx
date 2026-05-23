@@ -6,6 +6,7 @@ import LoginPage from "../pages/LoginPage.tsx";
 import * as React from "react";
 import type {Product, Basket} from "../interfaces/definitions.ts";
 import InfoPage from "../pages/InfoPage.tsx";
+import RegisterPage from "../pages/RegisterPage.tsx";
 
 interface RouterProps {
     products: Product[];
@@ -27,7 +28,8 @@ function Router({products, setProducts, basket, setBasket}: Readonly<RouterProps
                 setBasket={setBasket}
             />}/>
             <Route path="/info" element={<InfoPage />}></Route>
-            <Route path="login" element={<LoginPage />}></Route>
+            <Route path="/login" element={<LoginPage />}></Route>
+            <Route path="/register" element={<RegisterPage />}></Route>
         </Routes>
     )
 }

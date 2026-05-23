@@ -1,21 +1,26 @@
 import { useState} from 'react';
 import type {ChangeEvent, FormEvent} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
-import { loginUser } from '../services/api.ts';
+import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../services/api.ts';
 import "./LoginPage.css";
 
-function LoginPage() {
+function RegisterPage() {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+
+        // BOMBKA 1: Podstawowa walidacja długości hasła
+        if (password.length < 6) {
+            alert("Hasło musi mieć minimum 6 znaków");
+            return;
+        }
+
         try {
-            const data = await loginUser(email, password);
-            localStorage.setItem("auth_token", data.token);
-            console.log("Zalogowano:", data);
-            navigate("/");
+            await registerUser(email, password);
+            navigate('/login'); // Po sukcesie wracamy do logowania
         } catch (err) {
             alert((err as Error).message);
         }
@@ -24,7 +29,7 @@ function LoginPage() {
     return (
         <main className="auth-page">
             <form className="auth-form" onSubmit={handleSubmit}>
-                <h2>Logowanie</h2>
+                <h2>Rejestracja</h2>
                 <input
                     type="email" placeholder="Email" required
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
@@ -33,20 +38,10 @@ function LoginPage() {
                     type="password" placeholder="Hasło" required
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 />
-                <button type="submit" className="cta-button">Zaloguj</button>
-
-                <div style={{textAlign: 'center', margin: '10px 0'}}>lub</div>
-
-                <a href="http://localhost:13000/auth/google/login" className="google-button">
-                    Zaloguj przez Google
-                </a>
-
-                <Link to="/register" className="google-button">
-                    Rejestruj
-                </Link>
+                <button type="submit" className="cta-button">Zarejestruj się</button>
             </form>
         </main>
     );
 }
 
-export default LoginPage;
+export default RegisterPage;
