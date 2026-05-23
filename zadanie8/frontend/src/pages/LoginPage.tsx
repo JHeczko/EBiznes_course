@@ -1,50 +1,95 @@
-import { useState} from 'react';
-import type {ChangeEvent, FormEvent} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import { useState } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/api.ts';
 import "./LoginPage.css";
+import toast from "react-hot-toast";
 
 function LoginPage() {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+        return localStorage.getItem("auth_token") !== null;
+    });
+
+    const [savedUserId, setSavedUserId] = useState<string | null>(() => {
+        return localStorage.getItem("user_id");
+    });
+
     const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         try {
             const data = await loginUser(email, password);
+
             localStorage.setItem("auth_token", data.token);
-            console.log("Zalogowano:", data);
+            localStorage.setItem("user_id", String(data.user_id));
+
+            setIsLoggedIn(true);
+            setSavedUserId(String(data.user_id));
+
+            console.log("Logged in:", data);
+            toast.success("Login Successful");
             navigate("/");
         } catch (err) {
-            alert((err as Error).message);
+            toast.error((err as Error).message);
         }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user_id");
+
+        setIsLoggedIn(false);
+        setSavedUserId(null);
+
+        toast.success("Logged out successfully");
+        navigate("/login");
     };
 
     return (
         <main className="auth-page">
-            <form className="auth-form" onSubmit={handleSubmit}>
-                <h2>Logowanie</h2>
-                <input
-                    type="email" placeholder="Email" required
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                />
-                <input
-                    type="password" placeholder="Hasło" required
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                />
-                <button type="submit" className="cta-button">Zaloguj</button>
+            {isLoggedIn ? (
+                /* ⬇️ VIEW FOR LOGGED IN USER (ZERO INLINE STYLES) ⬇️ */
+                <div className="auth-form text-center">
+                    <h2>You are already logged in!</h2>
+                    <p>
+                        Logged in as user ID: <strong>{savedUserId || "Unknown"}</strong>
+                    </p>
 
-                <div style={{textAlign: 'center', margin: '10px 0'}}>lub</div>
+                    {/* Łączymy klasę bazową przycisku z naszą nową, grafitową wersją */}
+                    <button onClick={handleLogout} className="google-button logout-button">
+                        Log Out
+                    </button>
+                    
+                </div>
+            ) : (
+                /* ⬇️ LOGIN FORM ⬇️ */
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <h2>Login</h2>
+                    <input
+                        type="email" placeholder="Email" required
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                    />
+                    <input
+                        type="password" placeholder="Password" required
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                    />
+                    <button type="submit" className="cta-button google-button">Sign In</button>
 
-                <a href="http://localhost:13000/auth/google/login" className="google-button">
-                    Zaloguj przez Google
-                </a>
+                    <div className="text-center">or</div>
 
-                <Link to="/register" className="google-button">
-                    Rejestruj
-                </Link>
-            </form>
+                    <a href="http://localhost:13000/auth/google/login" className="google-button">
+                        Sign in with Google
+                    </a>
+
+                    <Link to="/register" className="google-button">
+                        Register
+                    </Link>
+                </form>
+            )}
         </main>
     );
 }

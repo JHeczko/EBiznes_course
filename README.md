@@ -181,4 +181,7 @@ Klucz należy uzyskać na:
 
 Commits:
 - 3.0: https://github.com/JHeczko/EBiznes_course/commit/0c2ce2692e853475229cc8b315ec2e27f9c7ff0e
-- 3.5: 
+- 3.5: https://github.com/JHeczko/EBiznes_course/commit/dde27a4c0427e8e9d425afdc7aefb7c30d3576d4
+- 4.0:
+- 4.5:
+- 5.0:

@@ -3,6 +3,7 @@ import type {ChangeEvent, FormEvent} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/api.ts';
 import "./LoginPage.css";
+import toast from "react-hot-toast";
 
 function RegisterPage() {
     const [email, setEmail] = useState<string>('');
@@ -14,15 +15,16 @@ function RegisterPage() {
 
         // BOMBKA 1: Podstawowa walidacja długości hasła
         if (password.length < 6) {
-            alert("Hasło musi mieć minimum 6 znaków");
+            toast.error("Hasło musi mieć minimum 6 znaków");
             return;
         }
 
         try {
             await registerUser(email, password);
             navigate('/login'); // Po sukcesie wracamy do logowania
+            toast.success("Register successful");
         } catch (err) {
-            alert((err as Error).message);
+            toast.error((err as Error).message);
         }
     };
 

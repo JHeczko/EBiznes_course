@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 	"zadanie4/handlers"
-	
+	"zadanie4/middleware_handlers"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/sqlite"
@@ -60,6 +60,7 @@ func main() {
         echo.HeaderContentType,
         echo.HeaderAccept,
         "ngrok-skip-browser-warning",
+		echo.HeaderAuthorization,
     },
     AllowCredentials: false,
 	}))
@@ -86,6 +87,7 @@ func main() {
 	userEndpoint := "/:user_id"
 
 	cartEndpoints := e.Group("/cart")
+	cartEndpoints.Use(middleware_handlers.AuthMiddleware)
 	{
 		cartEndpoints.GET(userEndpoint, handlers.GetItems(db))
 		cartEndpoints.POST(userEndpoint, handlers.CreateItem(db))
@@ -94,13 +96,14 @@ func main() {
 	}
 
 	paymentsEndpoints := e.Group("/payments")
-
+	paymentsEndpoints.Use(middleware_handlers.AuthMiddleware)
 	{
 		paymentsEndpoints.GET(userEndpoint, handlers.GetPayments(db))
 		paymentsEndpoints.POST(userEndpoint, handlers.AddPayment(db))
 	}
-	// ... wewnątrz main() ...
+
 	authGroup := e.Group("/auth")
+	//authGroup.Use(middleware_handlers.AuthMiddleware)
 	{
 		authGroup.POST("/register", handlers.Register(db))
 		authGroup.POST("/login", handlers.Login(db))

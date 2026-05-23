@@ -43,3 +43,24 @@
 .google-button:hover {
     background: #333;
 }
+
+/* Nowy, stonowany kolor dla guzika wylogowania, dziedziczący styl po głównej marce */
+.logout-button {
+    background: #4a5568;
+    border: none;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background: #2d3748;
+}
+
+
+.home-link:hover {
+    text-decoration: underline;
+}
+
+/* Pomocniczy kontener na wyśrodkowany tekst */
+.text-center {
+    text-align: center;
+}

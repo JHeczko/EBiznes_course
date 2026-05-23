@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"zadanie4/models"
+	"zadanie4/middleware_handlers"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -45,8 +46,6 @@ func Register(db *gorm.DB) echo.HandlerFunc {
 }
 
 // 3.0 Logowanie
-// Klucz trzymaj w zmiennej środowiskowej w produkcji!
-var jwtKey = []byte("super_tajny_klucz_123") 
 
 func Login(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -67,14 +66,14 @@ func Login(db *gorm.DB) echo.HandlerFunc {
 		}
 
 		// 3. Generowanie JWT
-		expirationTime := time.Now().Add(24 * time.Hour)
+		expirationTime := time.Now().Add(30 * time.Minute)
 		claims := jwt.MapClaims{
 			"user_id": user.UserID,
 			"exp":     expirationTime.Unix(),
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString(jwtKey)
+		tokenString, err := token.SignedString(middleware_handlers.JwtKey)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Could not create token"})
 		}
