@@ -1,5 +1,5 @@
 
-# zadanie7-frontend
+# E biznes course
 
 ## Zadanie 1 Docker
 
@@ -157,3 +157,24 @@ Commits:
 - 4.0: https://github.com/JHeczko/zadanie7-backend/commit/53ea78ac7d6ef06a6468c26e0e79b94b488c8b5f
 - 4.5: https://github.com/JHeczko/zadanie7-backend/commit/53ea78ac7d6ef06a6468c26e0e79b94b488c8b5f
 - 5.0: https://github.com/JHeczko/zadanie7-frontend/commit/546f5f0ae78cd79e14419dd913abc7856584a3e0
+
+## Zadanie 8 
+Należy skonfigurować klienta Oauth2 (4.0). Dane o użytkowniku wraz z
+tokenem powinny być przechowywane po stronie bazy serwera, a nowy
+token (inny niż ten od dostawcy) powinien zostać wysłany do klienta
+(React). Można zastosować mechanizm sesji lub inny dowolny (5.0).
+Zabronione jest tworzenie klientów bezpośrednio po stronie React'a
+wyłączając z komunikacji aplikację serwerową.
+
+Prawidłowa komunikacja: react-sewer-dostawca-serwer(via return
+uri)-react.
+
+- 3.0 logowanie przez aplikację serwerową (bez Oauth2)
+- 3.5 rejestracja przez aplikację serwerową (bez Oauth2)
+- 4.0 logowanie via Google OAuth2
+- 4.5 logowanie via Facebook lub Github OAuth2
+- 5.0 zapisywanie danych logowania OAuth2 po stronie serwera
+
+Klucz należy uzyskać na:
+- https://console.cloud.google.com/apis/dashboard,
+- https://developers.facebook.com/

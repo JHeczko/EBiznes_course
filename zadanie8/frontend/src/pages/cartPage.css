@@ -1,0 +1,118 @@
+.cart-page {
+    padding: 2rem;
+}
+
+.cart-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.empty-cart-message {
+    /* Zmieniono z #888 na #6b6b6b - teraz spełnia normę 4.5:1 na białym tle */
+    color: #6b6b6b;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.cart-item {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #fff;
+}
+
+.item-upper {
+    margin-bottom: 0.5rem;
+}
+
+.item-lower {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.control-quantity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quantity-control-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    /* Przyciemniono obramowanie z #ccc na #949494 dla lepszej widoczności elementów UI */
+    border: 1px solid #949494;
+    border-radius: 4px;
+    background: #f5f5f5;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0;
+    line-height: 1;
+    transition: background 0.15s;
+    color: #333;
+}
+
+.quantity-control-button:hover {
+    background: #e0e0e0;
+}
+
+.quantity-control-button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+.delete-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    /* Zmieniono z #e53935 na #d32f2f - głębsza czerwień spełniająca wymogi kontrastu */
+    color: #d32f2f;
+    padding: 0;
+    transition: background 0.15s;
+}
+
+.delete-button:hover {
+    background: #fdecea;
+}
+
+.delete-button:focus-visible {
+    outline: 2px solid #d32f2f;
+    outline-offset: 2px;
+}
+
+.checkout-button {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.75rem 2rem;
+    background: #1d65c1;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.checkout-button:hover {
+    background: #164e96;
+}
+
+.checkout-button:focus-visible {
+    outline: 2px solid #164e96;
+    outline-offset: 2px;
+}
