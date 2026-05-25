@@ -17,24 +17,14 @@ import (
 
 
 func main() {
-	err := godotenv.Load("./.env")
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
 
 
 	// databse init
-	db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{
-		Logger: logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags),
-			logger.Config{
-				LogLevel:                  logger.Error,
-				IgnoreRecordNotFoundError: true,
-				Colorful:                  true,
-			},
-		),
-	})
-	// db, err := gorm.Open(sqlite.Open("/home/appuser/app/database.db"), &gorm.Config{
+	// db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{
 	// 	Logger: logger.New(
 	// 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 	// 		logger.Config{
@@ -44,6 +34,16 @@ func main() {
 	// 		},
 	// 	),
 	// })
+	db, err := gorm.Open(sqlite.Open("/home/appuser/app/database.db"), &gorm.Config{
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			logger.Config{
+				LogLevel:                  logger.Error,
+				IgnoreRecordNotFoundError: true,
+				Colorful:                  true,
+			},
+		),
+	})
 
 
 	if err != nil{
@@ -115,6 +115,8 @@ func main() {
 		authGroup.POST("/login", handlers.Login(db))
 		authGroup.GET("/google/login", handlers.HandleGoogleLogin)
 		authGroup.GET("/google/callback", handlers.HandleGoogleCallback(db))
+		authGroup.GET("/github/login", handlers.HandleGithubLogin)
+    	authGroup.GET("/github/callback", handlers.HandleGithubCallback(db))
 	}
 
 

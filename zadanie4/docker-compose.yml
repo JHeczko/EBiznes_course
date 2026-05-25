@@ -13,6 +13,8 @@ services:
       - "13000:13000"
     networks:
       - my-network
+    env_file:
+      - backend/.env
     restart: always
 
   frontend-service:
@@ -22,7 +24,7 @@ services:
     image: jheczko/frontend_business_app:latest
     container_name: react-frontend-service
     ports:
-      - "5173:80"
+      - "5173:8080"
     depends_on:
       - backend-service
     networks:

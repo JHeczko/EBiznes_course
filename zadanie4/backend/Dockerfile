@@ -5,8 +5,10 @@ RUN apk add --no-cache gcc musl-dev
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
+
 COPY main.go .
 COPY handlers/ handlers/
+COPY middleware_handlers/ middleware_handlers/
 COPY models/ models/
 COPY db_init/ db_init/
 

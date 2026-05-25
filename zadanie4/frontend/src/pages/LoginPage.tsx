@@ -19,21 +19,24 @@ function LoginPage() {
 
     const navigate = useNavigate();
 
-    // 🔥 POPRAWIONY HOOK: Brak bezpośredniego wywoływania setState w efekcie
+    // 🔥 Dynamiczne wyłapywanie parametrów z URL (Google / GitHub)
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
         const tokenFromUrl = queryParams.get("token");
         const userIdFromUrl = queryParams.get("user_id");
+        const providerFromUrl = queryParams.get("provider"); // Pobieramy info o dostawcy
 
         if (tokenFromUrl && userIdFromUrl) {
-            // 1. Zapisujemy bezpiecznie dane do pamięci podręcznej przeglądarki
             localStorage.setItem("auth_token", tokenFromUrl);
             localStorage.setItem("user_id", userIdFromUrl);
 
-            toast.success("Successfully logged in via Google!");
+            let providerName = "OAuth2";
+            if (providerFromUrl) {
+                providerName = providerFromUrl.charAt(0).toUpperCase() + providerFromUrl.slice(1);
+            }
 
-            // 2. Natychmiast uciekamy na stronę główną.
-            // Strona główna po zamontowaniu i tak sprawdzi localStorage i rozpozna usera jako zalogowanego.
+            toast.success(`Successfully logged in via ${providerName}!`);
+
             navigate("/", { replace: true });
         }
     }, [navigate]);
@@ -49,7 +52,6 @@ function LoginPage() {
             setIsLoggedIn(true);
             setSavedUserId(String(data.user_id));
 
-            console.log("Logged in:", data);
             toast.success("Login Successful");
             navigate("/");
         } catch (err) {
@@ -106,6 +108,10 @@ function LoginPage() {
 
                     <a href="http://localhost:13000/auth/google/login" className="google-button">
                         Sign in with Google
+                    </a>
+
+                    <a href="http://localhost:13000/auth/github/login" className="google-button github-button">
+                        Sign in with GitHub
                     </a>
 
                     <Link to="/register" className="google-button">

@@ -34,10 +34,10 @@ type Users struct {
     UserName  string `gorm:"column:UserName" json:"user_name"`
     Email     string `gorm:"column:Email" json:"mail"`
     
-    Password      string `gorm:"column:Password" json:"-"` // "-" bo nie chcemy go wysyłać do frontu
+    Password      string `gorm:"column:Password" json:"-"`
     Provider      string `gorm:"column:Provider;default:'local'" json:"provider"`
     ProviderID    string `gorm:"column:ProviderID" json:"provider_id"`
-    ProviderToken string `gorm:"column:ProviderToken" json:"-"` // Tutaj trzymasz token od Google/GitHub
+    ProviderToken string `gorm:"column:ProviderToken" json:"-"` 
 
     // Relations
     Basket []Basket `gorm:"foreignKey:UserID;references:UserID" json:"baskets,omitempty"` 

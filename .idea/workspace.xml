@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3640023e-3e1b-41bd-817c-0b7c847b20b4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zadanie4/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/zadanie4/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +25,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/zadanie4" />
     <option name="ROOT_SYNC" value="SYNC" />
   </component>
   <component name="NamedScopeManager">
@@ -106,7 +108,7 @@
       <workItem from="1778927248279" duration="22000" />
       <workItem from="1779527992443" duration="803000" />
       <workItem from="1779547813232" duration="8535000" />
-      <workItem from="1779697647356" duration="5480000" />
+      <workItem from="1779697647356" duration="10145000" />
     </task>
     <servers />
   </component>

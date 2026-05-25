@@ -76,23 +76,29 @@ func HandleGoogleCallback(db *gorm.DB) echo.HandlerFunc {
 		}
 
 		// Krok C: Sprawdzenie w bazie danych, czy użytkownik z tym mailem i providerem już istnieje
-		var user models.Users
-		err = db.Where("email = ? AND provider = ?", googleUser.Email, "google").First(&user).Error
+        var user models.Users
+        err = db.Where("email = ?", googleUser.Email).First(&user).Error
 
-		if err == gorm.ErrRecordNotFound {
-			// Jeśli użytkownika nie ma, automatycznie rejestrujemy nowe konto
-			user = models.Users{
-				Email:    googleUser.Email,
-				Password: "", // Logowanie zewnętrzne, brak lokalnego hasła
-				Provider: "google",
-				UserName: googleUser.Name,
-			}
-			if err := db.Create(&user).Error; err != nil {
-				return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Could not register user in database"})
-			}
-		} else if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Database query error"})
-		}
+        if err == gorm.ErrRecordNotFound {
+            // Jeśli maila w ogóle nie ma w bazie, rejestrujemy nowe konto
+            user = models.Users{
+                Email:    googleUser.Email,
+                Password: "", // Logowanie zewnętrzne, brak lokalnego hasła
+                Provider: "google",
+                UserName: googleUser.Name,
+            }
+            if err := db.Create(&user).Error; err != nil {
+                return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Could not register user in database"})
+            }
+        } else if err == nil { // jeśli jest w bazie, wtedy nalezy zmienic providera, na najnowszego
+            if user.Provider != "google" {
+                if err := db.Model(&user).Update("provider", "google").Error; err != nil {
+                    return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Could not update user provider"})
+                }
+            }
+        } else {
+            return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Database query error"})
+        }
 
 		// Krok D: Generowanie Twojego wewnętrznego JWT (dla Twojego AuthMiddleware)
 		expirationTime := time.Now().Add(30 * time.Minute)
@@ -108,7 +114,7 @@ func HandleGoogleCallback(db *gorm.DB) echo.HandlerFunc {
 		}
 
 		// Krok E: Przekierowanie z powrotem do Reacta z tokenem i userID w parametrach URL
-		reactRedirectURL := fmt.Sprintf("http://localhost:5173/login?token=%s&user_id=%d", appTokenString, user.UserID)
+		reactRedirectURL := fmt.Sprintf("http://localhost:5173/login?token=%s&user_id=%d&provider=google", appTokenString, user.UserID)
 		return c.Redirect(http.StatusMovedPermanently, reactRedirectURL)
 	}
 }
