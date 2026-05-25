@@ -187,3 +187,5 @@ Commits:
 - 5.0: https://github.com/JHeczko/EBiznes_course/commit/07aed62de2dbc3636dc7c671d8e79e8c71e9939d
 
 Demo:
+
+https://drive.google.com/file/d/1llJQxq-gGt7NBayddwAeO286bp67lrfT/view?usp=sharing
