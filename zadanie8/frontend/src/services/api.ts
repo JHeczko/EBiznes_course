@@ -27,8 +27,12 @@ api.interceptors.request.use((config) => {
 
 
 function validateNumericId(id: number): number {
+    if (id === -1) {
+        throw new Error("User is not logged in");
+    }
+
     if (!Number.isInteger(id) || id < 0) {
-        throw new Error("Invalid ID");
+        throw new Error("Invalid User ID");
     }
 
     return id;
@@ -99,11 +103,12 @@ export async function addToBasket(product: Product, userID: number, quantity?: n
 
 export async function updateBasket(product: Product, userID: number, quantity: number): Promise<[Basket, number]> {
     const validUserID = Number(userID);
-    if (Number.isNaN(validUserID)) throw new Error("Invalid User ID");
-    
+    // 🔥 Dodatkowe zabezpieczenie przed -1 przed wykonaniem dalszego kodu
+    validateNumericId(validUserID);
+
     const safeId = sanitizePathId(validUserID);
     const safeQuantity = validateQuantity(quantity);
-    
+
     const res = await api.patch(`/cart/${safeId}`, null, {
         params: {
             prod_id: product.id,
@@ -115,8 +120,8 @@ export async function updateBasket(product: Product, userID: number, quantity: n
 
 export async function deleteBasket(product: Product, userID: number): Promise<number> {
     const validUserID = Number(userID);
-    if (Number.isNaN(validUserID)) throw new Error("Invalid User ID");
-    
+    validateNumericId(validUserID);
+
     const safeId = sanitizePathId(validUserID);
     const res = await api.delete(`/cart/${safeId}`, {
         params: {

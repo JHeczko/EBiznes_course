@@ -26,7 +26,8 @@ function ProductsPage({products, setProducts}: Readonly<ProductsPageParams>) {
 
     const addItemToBasket = async (product: Product) => {
         try {
-            await addToBasket(product, 1);
+            const currentUserId = +(localStorage.getItem("user_id") ?? -1);
+            await addToBasket(product, currentUserId);
             toast.success(`Added "${product.name}" to cart`);
         }catch(err){
             toast.error(`Failed to add "${product.name} to basket"`);

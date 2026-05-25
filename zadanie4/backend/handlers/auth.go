@@ -73,7 +73,7 @@ func Login(db *gorm.DB) echo.HandlerFunc {
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString(middleware_handlers.JwtKey)
+		tokenString, err := token.SignedString(middleware_handlers.GetJwtKey())
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Could not create token"})
 		}

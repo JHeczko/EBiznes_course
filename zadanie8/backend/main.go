@@ -5,6 +5,7 @@ import (
 	"zadanie4/handlers"
 	"zadanie4/middleware_handlers"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -16,6 +17,12 @@ import (
 
 
 func main() {
+	err := godotenv.Load("./.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+
 	// databse init
 	db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{
 		Logger: logger.New(
@@ -103,10 +110,11 @@ func main() {
 	}
 
 	authGroup := e.Group("/auth")
-	//authGroup.Use(middleware_handlers.AuthMiddleware)
 	{
 		authGroup.POST("/register", handlers.Register(db))
 		authGroup.POST("/login", handlers.Login(db))
+		authGroup.GET("/google/login", handlers.HandleGoogleLogin)
+		authGroup.GET("/google/callback", handlers.HandleGoogleCallback(db))
 	}
 
 

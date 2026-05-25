@@ -1,72 +1,87 @@
 .cart-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
     padding: 2rem;
+}
+
+.cart-page h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
 }
 
 .cart-container {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 1.2rem;
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .empty-cart-message {
-    /* Zmieniono z #888 na #6b6b6b - teraz spełnia normę 4.5:1 na białym tle */
-    color: #6b6b6b;
+    color: #4b5563; /* Spójny z Twoją klasą .category */
     text-align: center;
     margin-top: 2rem;
+    font-size: 1.2rem;
 }
 
 .cart-item {
+    background-color: #eee; /* Tło identyczne jak w .product-card oraz .category-item */
     display: flex;
     flex-direction: column;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 1rem;
-    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 15px; /* Spójne zaokrąglenie z resztą kafelków */
+    padding: 20px;
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
 }
 
-.item-upper {
-    margin-bottom: 0.5rem;
+.cart-item:hover {
+    transform: scale(1.01);
+}
+
+.item-upper h3 {
+    margin: 0;
+    color: #1a1a1a;
+    font-weight: 700;
 }
 
 .item-lower {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-top: 1rem;
 }
 
 .control-quantity {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.8rem;
 }
 
 .quantity-control-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    /* Przyciemniono obramowanie z #ccc na #949494 dla lepszej widoczności elementów UI */
-    border: 1px solid #949494;
-    border-radius: 4px;
-    background: #f5f5f5;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #ddd;
+    border-radius: 50%; /* Okrągłe guziki kontroli dla lżejszego wyglądu */
+    background: #fff;
     cursor: pointer;
     font-size: 1.2rem;
     font-weight: bold;
-    padding: 0;
-    line-height: 1;
-    transition: background 0.15s;
-    color: #333;
+    transition: all 0.2s;
+    color: #1a1a1a;
 }
 
 .quantity-control-button:hover {
-    background: #e0e0e0;
-}
-
-.quantity-control-button:focus-visible {
-    outline: 2px solid #2563eb;
-    outline-offset: 2px;
+    background: #e9d5ff; /* Fioletowy hover pasujący do reszty */
+    border-color: #a855f7;
 }
 
 .delete-button {
@@ -76,43 +91,52 @@
     width: 36px;
     height: 36px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     background: transparent;
     cursor: pointer;
-    /* Zmieniono z #e53935 na #d32f2f - głębsza czerwień spełniająca wymogi kontrastu */
     color: #d32f2f;
-    padding: 0;
-    transition: background 0.15s;
+    margin-left: 0.5rem;
+    transition: background 0.2s;
 }
 
 .delete-button:hover {
     background: #fdecea;
 }
 
-.delete-button:focus-visible {
-    outline: 2px solid #d32f2f;
-    outline-offset: 2px;
+.price-tag-cart {
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: #333;
 }
 
+/* Przycisk kasy i powrotu - 1:1 Twój cta-button / add-to-cart-btn */
 .checkout-button {
-    display: inline-block;
-    margin-top: 1.5rem;
-    padding: 0.75rem 2rem;
-    background: #1d65c1;
-    color: #fff;
+    background-color: #9333ea;
+    color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
+    outline: none;
+    padding: 12px 40px;
+    border-radius: 30px;
+    font-weight: bold;
     cursor: pointer;
-    transition: background 0.15s;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.2s;
+    display: inline-block;
+    text-decoration: none;
+    margin-top: 2rem;
+    text-align: center;
 }
 
 .checkout-button:hover {
-    background: #164e96;
+    background-color: #7e22ce;
+    transform: translateY(-3px);
+}
+
+.checkout-button:active {
+    transform: translateY(1px);
 }
 
 .checkout-button:focus-visible {
-    outline: 2px solid #164e96;
+    outline: 2px solid #a855f7;
     outline-offset: 2px;
 }

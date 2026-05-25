@@ -3,12 +3,23 @@ package middleware_handlers
 import (
 	"log"
 	"net/http"
+	"os"
 	"strings"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
-var JwtKey = []byte("bardzo_tajny_klucz_ktory_tylko_ty_znasz")
+// 🔥 FUNKCJA ZAMIAST ZMIENNEJ GLOBALNEJ: 
+// Dynamicznie wyciąga klucz JWT z systemu po tym, jak .env zostanie załadowany.
+func GetJwtKey() []byte {
+	secret := os.Getenv("JWT_KEY")
+	if secret == "" {
+		// Mały bezpiecznik: jeśli zapomnisz dodać JWT_KEY do .env, aplikacja rzuci ostrzeżenie w logach
+		log.Println("[WARNING] JWT_KEY is empty! Check your .env file.")
+	}
+	return []byte(secret)
+}
 
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -28,13 +39,14 @@ func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		tokenString := parts[1]
 
 		// 3. Parsowanie i weryfikacja
+		// 🔥 Zmiana: wywołujemy GetJwtKey() zamiast starej zmiennej globalnej
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return JwtKey, nil
+			return GetJwtKey(), nil
 		})
 
 		// 4. Sprawdzenie błędów (w tym wygaśnięcia!)
 		if err != nil {
-			log.Printf("[AUTH ERROR] Weryfikacja JWT nieudana: %v\n", err) // Tu wypisze np. "token is expired" albo "signature is invalid"
+			log.Printf("[AUTH ERROR] Weryfikacja JWT nieudana: %v\n", err)
 			return c.JSON(http.StatusUnauthorized, echo.Map{"error": "Token nieważny lub wygasł"})
 		}
 

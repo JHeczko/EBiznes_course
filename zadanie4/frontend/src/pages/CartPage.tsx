@@ -2,6 +2,7 @@ import "./cartPage.css"
 import type {Basket, Product} from "../interfaces/definitions.ts";
 import * as React from "react";
 import {useEffect} from "react";
+import {Link} from "react-router-dom";
 import {addPayment, clearBasket, deleteBasket, getBasket, updateBasket} from "../services/api.ts";
 import toast from "react-hot-toast";
 
@@ -11,6 +12,7 @@ type CartPageProps = Readonly<{
 }>
 
 function CartPage({basket, setBasket}: CartPageProps) {
+    const hasToken = localStorage.getItem("auth_token") !== null;
 
     const handleQuantityChange = async (product: Product, userID: number, newQuantity: number) => {
         if (newQuantity < 1) return;
@@ -45,7 +47,7 @@ function CartPage({basket, setBasket}: CartPageProps) {
             console.error("Error while deleting item from basket: ", error)
             toast.error("Could not delete item :(");
         }
-    }
+    };
 
     const handlePayment = async (userID: number) => {
         try {
@@ -61,16 +63,43 @@ function CartPage({basket, setBasket}: CartPageProps) {
             console.error("Error while finalizing payment: ", error)
             toast.error("Couldn't finalize payment!")
         }
-    }
+    };
 
     useEffect(() => {
+        if (!hasToken) return;
+
         const loadBasketFromDb = async (userID: number) => {
             const basketFromDb = await getBasket(userID);
             setBasket(basketFromDb);
         }
-        loadBasketFromDb(1);
-    }, [])
 
+        const currentUserId = +(localStorage.getItem("user_id") ?? -1);
+        if (currentUserId >= 0) {
+            loadBasketFromDb(currentUserId);
+        }
+    }, [hasToken]);
+
+    // ⬇️ WIDOK DLA NIEZALOGOWANEGO UŻYTKOWNIKA (UŻYWA TWOICH KLAS CSS) ⬇️
+    if (!hasToken) {
+        return (
+            <main className="cart-page">
+                <h1>Cart</h1>
+                <div className="cart-container">
+                    <h4 className="empty-cart-message">
+                        You must be logged in to view your cart!
+                    </h4>
+
+                    <div>
+                        <Link to="/login" className="checkout-button">
+                            Go to Login
+                        </Link>
+                    </div>
+                </div>
+            </main>
+        );
+    }
+
+    // ⬇️ WIDOK DLA ZALOGOWANEGO UŻYTKOWNIKA ⬇️
     return (
         <main className="cart-page">
             <h1>Cart</h1>
@@ -113,7 +142,9 @@ function CartPage({basket, setBasket}: CartPageProps) {
                                         </svg>
                                     </button>
                                 </div>
-                                <h5>{(item.quantity * item.product.price).toFixed(2)} zł</h5>
+                                <span className="price-tag-cart">
+                                    {(item.quantity * item.product.price).toFixed(2)} zł
+                                </span>
                             </div>
                         </div>
                     ))
@@ -123,7 +154,7 @@ function CartPage({basket, setBasket}: CartPageProps) {
                 <button
                     type="button"
                     className="checkout-button"
-                    onClick={() => handlePayment(1)}
+                    onClick={() => handlePayment(+(localStorage.getItem("user_id") ?? -1))}
                 >Checkout</button>
             )}
         </main>

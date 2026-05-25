@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/api.ts';
@@ -18,6 +18,25 @@ function LoginPage() {
     });
 
     const navigate = useNavigate();
+
+    // 🔥 POPRAWIONY HOOK: Brak bezpośredniego wywoływania setState w efekcie
+    useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const tokenFromUrl = queryParams.get("token");
+        const userIdFromUrl = queryParams.get("user_id");
+
+        if (tokenFromUrl && userIdFromUrl) {
+            // 1. Zapisujemy bezpiecznie dane do pamięci podręcznej przeglądarki
+            localStorage.setItem("auth_token", tokenFromUrl);
+            localStorage.setItem("user_id", userIdFromUrl);
+
+            toast.success("Successfully logged in via Google!");
+
+            // 2. Natychmiast uciekamy na stronę główną.
+            // Strona główna po zamontowaniu i tak sprawdzi localStorage i rozpozna usera jako zalogowanego.
+            navigate("/", { replace: true });
+        }
+    }, [navigate]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -52,21 +71,25 @@ function LoginPage() {
     return (
         <main className="auth-page">
             {isLoggedIn ? (
-                /* ⬇️ VIEW FOR LOGGED IN USER (ZERO INLINE STYLES) ⬇️ */
+                /* VIEW FOR LOGGED IN USER */
                 <div className="auth-form text-center">
                     <h2>You are already logged in!</h2>
                     <p>
                         Logged in as user ID: <strong>{savedUserId || "Unknown"}</strong>
                     </p>
 
-                    {/* Łączymy klasę bazową przycisku z naszą nową, grafitową wersją */}
                     <button onClick={handleLogout} className="google-button logout-button">
                         Log Out
                     </button>
-                    
+
+                    <div style={{ marginTop: '20px' }}>
+                        <Link to="/" className="home-link">
+                            Back to Home Page
+                        </Link>
+                    </div>
                 </div>
             ) : (
-                /* ⬇️ LOGIN FORM ⬇️ */
+                /* LOGIN FORM */
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <h2>Login</h2>
                     <input
