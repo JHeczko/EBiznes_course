@@ -204,3 +204,10 @@ należy stworzyć w Pythonie.
 - 5.0 filtrowanie odpowiedzi po sentymencie
 
 Można wykorzystać lokalny model przez ollama (https://ollama.com/).
+
+Commits:
+- 3.0: https://github.com/JHeczko/EBiznes_course/commit/5ac7e55217e9a24e0be51fa50b27670ec3032680
+- 3.5: 
+- 4.0:
+- 4.5:
+- 5.0:

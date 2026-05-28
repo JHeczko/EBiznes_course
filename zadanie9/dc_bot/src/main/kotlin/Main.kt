@@ -1,5 +1,10 @@
 package org.zadanie
 
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import io.ktor.server.request.receiveText
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.core.on
@@ -8,6 +13,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.launch
 import dev.kord.gateway.Intent
@@ -21,7 +27,7 @@ fun main() {
         Category("Laptopy"),    // ID: 1
         Category("Podzespoly"), // ID: 2
         Category("Akcesoria"),  // ID: 3
-        Category("Monitory"),   // ID: 4
+        Category("Monitory"),    // ID: 4
         Category("Jedzenie")    // ID: 5
     )
 
@@ -46,6 +52,7 @@ fun main() {
 
     embeddedServer(Netty, port = 8000) {
         val token: String = System.getenv("DISCORD_BOT_TOKEN") ?: ""
+        val pythonApiUrl: String = System.getenv("PYTHON_API_URL") ?: "http://backend-service:8001/ask"
 
         launch {
             val kord = Kord(token)
@@ -58,48 +65,76 @@ fun main() {
 
                 val text = message.content.trim()
 
-                // ping handler
+                if (text.startsWith("!ask ")) {
+                    val question = text.substringAfter("!ask ").trim()
+
+                    if (question.isNotEmpty()) {
+                        try {
+                            // KLUCZOWA ZMIANA: Wymuszamy HTTP/1.1
+                            val client = HttpClient.newBuilder()
+                                .version(HttpClient.Version.HTTP_1_1)
+                                .build()
+
+                            // NAPRAWA: Zwykły escape zamiast potrójnych cudzysłowów
+                            val escapedQuestion = question.replace("\"", "\\\"").replace("\n", "\\n")
+                            val jsonBody = "{\"question\": \"$escapedQuestion\"}"
+
+                            // NAPRAWA: Dodany nagłówek Accept
+                            val request = HttpRequest.newBuilder()
+                                .uri(URI.create(pythonApiUrl))
+                                .header("Content-Type", "application/json")
+                                .header("Accept", "application/json")
+                                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                                .build()
+
+                            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+                            val responseText = response.body()
+                                .substringAfter("\"response\":\"")
+                                .substringBeforeLast("\"}")
+                                .replace("\\n", "\n")
+                                .replace("\\\"", "\"")
+
+                            message.channel.createMessage("🤖 AI: $responseText")
+
+                        } catch (e: Exception) {
+                            message.channel.createMessage("Błąd połączenia z backendem AI: ${e.message}")
+                            println(e)
+                        }
+                    } else {
+                        message.channel.createMessage("Użycie: !ask <twoje pytanie>")
+                    }
+                }
+
                 if (text.startsWith("!ping:")) {
                     val text_message = text.substringAfter("!ping")
-
                     if (text_message.isEmpty()){
                         message.channel.createMessage("pong")
                     } else {
                         message.channel.createMessage("pong: ${text_message}")
                     }
-                    println("PingPong: $text")
                 }
 
-                // zad 4.0
                 if (text.startsWith("!cat")) {
-                    println("Category print")
-
                     var messege_back = "-----All avaible categories-----\n"
-
                     for (cat in categories) {
                         messege_back += " - ${cat.cat_name}\n\t - Category ID: ${cat.cat_id}\n"
                     }
-
                     message.channel.createMessage(messege_back)
-                    println("Listed categories")
                 }
 
-                // zad 4.5
                 if (text.startsWith("!prod")) {
-                    println("Prod print")
                     val cat_id = text.substringAfter("!prod ").trim().toIntOrNull()
-
                     if (cat_id == null) {
                         message.channel.createMessage("Please enter a category number!")
                     } else {
-                        val category_name = categories.find({ x -> x.cat_id == cat_id })?.cat_name
-                        val filtered_prods = products.filter( {x -> x.cat_id == cat_id} )
+                        val category_name = categories.find { x -> x.cat_id == cat_id }?.cat_name
+                        val filtered_prods = products.filter { x -> x.cat_id == cat_id }
 
                         if(filtered_prods.isEmpty()) {
                             message.channel.createMessage("No avaible products for category ${category_name ?: cat_id}!")
                         } else {
                             var out_string = "Available products from category ${category_name}:\n"
-
                             for (prod in products) {
                                 if (prod.cat_id == cat_id) {
                                     out_string += " - ${prod.prod_name}: ${prod.price} PLN\n"
@@ -121,17 +156,44 @@ fun main() {
 
                     call.respondText("Send to discord $messegeText", contentType = ContentType.Text.Plain)
                 }
+
+                post("/api/ask-bot") {
+                    val userText = call.receiveText()
+
+                    try {
+                        // KLUCZOWA ZMIANA: Wymuszamy HTTP/1.1 również tutaj
+                        val client = HttpClient.newBuilder()
+                            .version(HttpClient.Version.HTTP_1_1)
+                            .build()
+
+                        // NAPRAWA: Zwykły escape zamiast potrójnych cudzysłowów
+                        val escapedQuestion = userText.replace("\"", "\\\"").replace("\n", "\\n")
+                        val jsonBody = "{\"question\": \"$escapedQuestion\"}"
+
+                        // NAPRAWA: Dodany nagłówek Accept
+                        val request = HttpRequest.newBuilder()
+                            .uri(URI.create(pythonApiUrl))
+                            .header("Content-Type", "application/json")
+                            .header("Accept", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                            .build()
+
+                        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+                        call.respondText(response.body(), contentType = ContentType.Application.Json)
+
+                    } catch (e: Exception) {
+                        call.respondText("""{"error": "${e.message}"}""", contentType = ContentType.Application.Json)
+                    }
+                }
             }
 
             try {
-                println("LOGGING IN...")
                 kord.login {
                     @OptIn(PrivilegedIntent::class)
                     intents += Intent.MessageContent
                 }
-                println("LOGGED!")
             } catch (e: Exception) {
-                println("ERROR: ${e.message}")
                 e.printStackTrace()
             }
         }

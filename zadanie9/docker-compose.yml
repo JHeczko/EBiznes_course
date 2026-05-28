@@ -1,0 +1,77 @@
+networks:
+  frontend-network:
+    name: frontend-network
+    driver: bridge
+  backend-network:
+    name: backend-network
+    driver: bridge
+
+services:
+  backend-service:
+    image: fastapi-backend:latest
+    container_name: fastapi-backend
+
+    build:
+      context: ./
+      dockerfile: Dockerfile
+
+    ports:
+      - "8001:8001"
+
+    environment:
+      OLLAMA_URL: "http://host.docker.internal:11434"
+
+    networks:
+      - backend-network
+
+    stdin_open: true
+    tty: true
+
+    restart: always
+
+  dc-bot:
+    image: ktor-dc:latest
+
+    build:
+      context: ./dc_bot
+      dockerfile: Dockerfile
+
+    container_name: ktor-dc-bot
+
+    ports:
+      - "8000:8000"
+
+    networks:
+      - frontend-network
+      - backend-network
+
+    environment:
+      PYTHON_API_URL: "http://backend-service:8001/ask"
+
+    env_file:
+      - ./.env
+
+    restart: always
+
+    depends_on:
+      - backend-service
+
+  frontend-nginx:
+    image: nginx:1.30-alpine3.23
+
+    container_name: nginx-frontend
+
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+
+    ports:
+      - "13000:80"
+
+    restart: always
+
+    networks:
+      - frontend-network
+
+    depends_on:
+      - backend-service
+      - dc-bot

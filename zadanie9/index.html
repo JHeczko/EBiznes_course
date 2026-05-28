@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sklep Asystent AI</title>
+    <style>
+        /* Casualowy, elegancki styl z niebieskimi i czarnymi akcentami */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef0f2; /* Jasna, chłodna szarość */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #1f2937; /* Ciemny, prawie czarny szary */
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 450px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #d1d5db;
+        }
+        .chat-header {
+            background-color: #111827; /* Czarny akcent */
+            color: #ffffff;
+            padding: 16px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+        .chat-box {
+            height: 400px;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: #f9fafb; /* Bardzo delikatna szarość */
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .msg-user {
+            background-color: #3b82f6; /* Przyjemny niebieski */
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+        .msg-bot {
+            background-color: #e5e7eb; /* Szary */
+            color: #111827; /* Czarny tekst */
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+        .input-area {
+            display: flex;
+            padding: 16px;
+            background-color: #ffffff;
+            border-top: 1px solid #e5e7eb;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus {
+            border-color: #3b82f6; /* Niebieski focus */
+        }
+        button {
+            background-color: #111827; /* Czarny guzik */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #3b82f6; /* Zmienia się w niebieski na hover */
+        }
+        .loading {
+            font-size: 0.8rem;
+            color: #6b7280;
+            align-self: flex-start;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">Asystent Sklepu AI</div>
+    <div class="chat-box" id="chatBox">
+        <div class="message msg-bot">Cześć! W czym mogę Ci dzisiaj pomóc?</div>
+    </div>
+    <div class="loading" id="loadingIndicator">Bot pisze...</div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Wpisz swoje pytanie..." onkeypress="handleEnter(event)">
+        <button onclick="sendMessage()">Wyślij</button>
+    </div>
+</div>
+
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const loading = document.getElementById('loadingIndicator');
+
+    // Zakładamy, że Kotlin stoi na porcie 8000
+    const KOTLIN_API_URL = 'http://localhost:8000/api/ask-bot';
+
+    function addMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message');
+        msgDiv.classList.add(sender === 'user' ? 'msg-user' : 'msg-bot');
+        msgDiv.textContent = text;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        userInput.value = '';
+        loading.style.display = 'block';
+
+        try {
+            // JS uderza POST-em do Kotlina
+            const response = await fetch(KOTLIN_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' }, // Ktor ładnie złapie to jako receiveText()
+                body: text
+            });
+
+            const data = await response.json();
+
+            if (data.response) {
+                addMessage(data.response, 'bot');
+            } else if (data.error) {
+                addMessage("Błąd serwera: " + data.error, 'bot');
+            } else {
+                addMessage("Niezrozumiała odpowiedź z serwera.", 'bot');
+            }
+        } catch (error) {
+            addMessage("Błąd połączenia. Upewnij się, że serwer Kotlin (Ktor) jest odpalony.", 'bot');
+            console.error(error);
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    function handleEnter(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+</script>
+
+</body>
+</html>
