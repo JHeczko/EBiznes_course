@@ -24,7 +24,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/zadanie4" />
     <option name="ROOT_SYNC" value="SYNC" />
   </component>
   <component name="NamedScopeManager">
@@ -107,7 +107,8 @@
       <workItem from="1778927248279" duration="22000" />
       <workItem from="1779527992443" duration="803000" />
       <workItem from="1779547813232" duration="8535000" />
-      <workItem from="1779697647356" duration="11427000" />
+      <workItem from="1779697647356" duration="11574000" />
+      <workItem from="1779895821081" duration="2084000" />
     </task>
     <servers />
   </component>
