@@ -109,7 +109,6 @@
 <div class="chat-container">
     <div class="chat-header">Asystent Sklepu AI</div>
     <div class="chat-box" id="chatBox">
-        <div class="message msg-bot">Cześć! W czym mogę Ci dzisiaj pomóc?</div>
     </div>
     <div class="loading" id="loadingIndicator">Bot pisze...</div>
     <div class="input-area">
@@ -126,6 +125,33 @@
     // Zakładamy, że Kotlin stoi na porcie 8000
     const KOTLIN_API_URL = 'http://localhost:8000/api/ask-bot';
 
+    // --- ZADANIE 4.0: REPOZYTORIUM ZWROTÓW ---
+    const openings = [
+        "Cześć! Szukasz nowego sprzętu, czy po prostu przeglądasz? W czym mogę Ci doradzić?",
+        "Hej! Tu Twój asystent AI. Składamy dzisiaj nowy komputer, czy szukamy akcesoriów?",
+        "Witaj w sklepie! Jeśli zgubiłeś się w gąszczu parametrów, śmiało pytaj – po to tu jestem.",
+        "Dzień dobry! W czym mogę pomóc? Szukamy czegoś do grania, czy sprzętu do pracy?",
+        "Cześć! Gotowy na sprzętowy upgrade? Napisz, czego potrzebujesz, a ja sprawdzę, co mamy na stanie."
+    ];
+
+    const closings = [
+        "Dzięki za rozmowę! Jakbyś czegoś jeszcze potrzebował, jestem tutaj 24/7.",
+        "Super, w razie kolejnych pytań wiesz, gdzie mnie szukać. Udanych zakupów!",
+        "Trzymaj się! Jeśli będziesz chciał dopytać o konkretne parametry, daj znać.",
+        "Z przyjemnością pomogłem! Czekam na kolejne wyzwania. Miłego dnia!",
+        "Do usłyszenia! Pamiętaj, że z dobrym sprzętem zawsze masz lepsze FPS-y. 😉"
+    ];
+
+    function getRandomElement(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // Losowanie otwarcia rozmowy zaraz po wejściu na stronę
+    window.onload = function() {
+        addMessage(getRandomElement(openings), 'bot');
+    };
+    // -----------------------------------------
+
     function addMessage(text, sender) {
         const msgDiv = document.createElement('div');
         msgDiv.classList.add('message');
@@ -141,6 +167,19 @@
 
         addMessage(text, 'user');
         userInput.value = '';
+
+        // --- OBSŁUGA ZAMKNIĘCIA ROZMOWY ---
+        const lowerText = text.toLowerCase();
+        if (lowerText === 'pa' || lowerText === 'pa pa' || lowerText === 'narazie' || lowerText === 'koniec' || lowerText === 'żegnam' || lowerText === 'bywaj') {
+            loading.style.display = 'block';
+            setTimeout(() => {
+                addMessage(getRandomElement(closings), 'bot');
+                loading.style.display = 'none';
+            }, 400); // Udajemy, że bot sekundę myśli nad pożegnaniem
+            return; // Przerywamy funkcję, żeby nie strzelać bez sensu do backendu
+        }
+        // ----------------------------------
+
         loading.style.display = 'block';
 
         try {
