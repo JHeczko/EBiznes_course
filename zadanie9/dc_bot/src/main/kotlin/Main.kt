@@ -95,7 +95,7 @@ fun main() {
                             val escapedQuestion = question.replace("\"", "\\\"").replace("\n", "\\n")
 
                             // --- MODYFIKACJA 4.5: SYSTEM PROMPT DLA DISCORDA ---
-                            val systemPrompt = "Jesteś asystentem sklepu. Odpowiadaj TYLKO na pytania związane z asortymentem sklepu. Nasze dostępne kategorie to: $allowedCategories. Jeśli użytkownik pyta o cokolwiek innego, odmów grzecznie i powiedz, że pomagasz tylko w sprawach naszego asortymentu. Pytanie użytkownika: "
+                            val systemPrompt = "You are a store assistant. Respond ONLY to questions related to the store's assortment. Our available product categories are: $allowedCategories. If the user asks about anything else, politely decline and say that you only help with matters regarding our assortment. User question: "
                             val jsonBody = "{\"question\": \"$systemPrompt$escapedQuestion\"}"
                             // ---------------------------------------------------
 
