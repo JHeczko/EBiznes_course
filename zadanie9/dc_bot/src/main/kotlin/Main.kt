@@ -19,12 +19,10 @@ import kotlinx.coroutines.launch
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 
-// --- NOWE IMPORTY DLA CORS ---
 import io.ktor.server.application.install
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpHeaders
-// -----------------------------
 
 import org.zadanie.Product
 import org.zadanie.Category
@@ -57,18 +55,19 @@ fun main() {
         Product(prod_name = "Samsung Odyssey G5", price = 1100.0, cat_id = 4)
     )
 
+    // --- ZADANIE 4.5: ZLEPIAMY KATEGORIE DO PROMPTA ---
+    val allowedCategories = categories.joinToString(", ") { it.cat_name }
+    // --------------------------------------------------
+
     embeddedServer(Netty, port = 8000) {
 
-        // --- KLUCZOWA ZMIANA: INSTALACJA CORS ---
-        // To mówi przeglądarce: "Śmiało, gadaj z Kturem!"
         install(CORS) {
-            anyHost() // Pozwala na zapytania z dowolnego portu/IP (np. 127.0.0.1:13000)
+            anyHost()
             allowHeader(HttpHeaders.ContentType)
             allowHeader(HttpHeaders.Accept)
             allowMethod(HttpMethod.Post)
             allowMethod(HttpMethod.Get)
         }
-        // ----------------------------------------
 
         val token: String = System.getenv("DISCORD_BOT_TOKEN") ?: ""
         val pythonApiUrl: String = System.getenv("PYTHON_API_URL") ?: "http://backend-service:8001/ask"
@@ -94,7 +93,11 @@ fun main() {
                                 .build()
 
                             val escapedQuestion = question.replace("\"", "\\\"").replace("\n", "\\n")
-                            val jsonBody = "{\"question\": \"$escapedQuestion\"}"
+
+                            // --- MODYFIKACJA 4.5: SYSTEM PROMPT DLA DISCORDA ---
+                            val systemPrompt = "Jesteś asystentem sklepu. Odpowiadaj TYLKO na pytania związane z asortymentem sklepu. Nasze dostępne kategorie to: $allowedCategories. Jeśli użytkownik pyta o cokolwiek innego, odmów grzecznie i powiedz, że pomagasz tylko w sprawach naszego asortymentu. Pytanie użytkownika: "
+                            val jsonBody = "{\"question\": \"$systemPrompt$escapedQuestion\"}"
+                            // ---------------------------------------------------
 
                             val request = HttpRequest.newBuilder()
                                 .uri(URI.create(pythonApiUrl))
@@ -182,7 +185,11 @@ fun main() {
                             .build()
 
                         val escapedQuestion = userText.replace("\"", "\\\"").replace("\n", "\\n")
-                        val jsonBody = "{\"question\": \"$escapedQuestion\"}"
+
+                        // --- MODYFIKACJA 4.5: SYSTEM PROMPT DLA FRONTENDU ---
+                        val systemPrompt = "You are a store assistant. Respond ONLY to questions related to the store's assortment. Our available product categories are: $allowedCategories. If the user asks about anything else, politely decline and say that you only help with matters regarding our assortment. User question: "
+                        val jsonBody = "{\"question\": \"$systemPrompt$escapedQuestion\"}"
+                        // ----------------------------------------------------
 
                         val request = HttpRequest.newBuilder()
                             .uri(URI.create(pythonApiUrl))
