@@ -23,7 +23,7 @@ async def ask_gpt(req: InputText):
 
         client = Client(host=ollama_url)
 
-        response = client.chat(model='gemma3', messages=[
+        response = client.chat(model='phi3', messages=[
             {
                 'role': 'user',
                 'content': req.question,

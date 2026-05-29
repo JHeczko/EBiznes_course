@@ -19,6 +19,13 @@ import kotlinx.coroutines.launch
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 
+// --- NOWE IMPORTY DLA CORS ---
+import io.ktor.server.application.install
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpHeaders
+// -----------------------------
+
 import org.zadanie.Product
 import org.zadanie.Category
 
@@ -51,6 +58,18 @@ fun main() {
     )
 
     embeddedServer(Netty, port = 8000) {
+
+        // --- KLUCZOWA ZMIANA: INSTALACJA CORS ---
+        // To mówi przeglądarce: "Śmiało, gadaj z Kturem!"
+        install(CORS) {
+            anyHost() // Pozwala na zapytania z dowolnego portu/IP (np. 127.0.0.1:13000)
+            allowHeader(HttpHeaders.ContentType)
+            allowHeader(HttpHeaders.Accept)
+            allowMethod(HttpMethod.Post)
+            allowMethod(HttpMethod.Get)
+        }
+        // ----------------------------------------
+
         val token: String = System.getenv("DISCORD_BOT_TOKEN") ?: ""
         val pythonApiUrl: String = System.getenv("PYTHON_API_URL") ?: "http://backend-service:8001/ask"
 
@@ -70,16 +89,13 @@ fun main() {
 
                     if (question.isNotEmpty()) {
                         try {
-                            // KLUCZOWA ZMIANA: Wymuszamy HTTP/1.1
                             val client = HttpClient.newBuilder()
                                 .version(HttpClient.Version.HTTP_1_1)
                                 .build()
 
-                            // NAPRAWA: Zwykły escape zamiast potrójnych cudzysłowów
                             val escapedQuestion = question.replace("\"", "\\\"").replace("\n", "\\n")
                             val jsonBody = "{\"question\": \"$escapedQuestion\"}"
 
-                            // NAPRAWA: Dodany nagłówek Accept
                             val request = HttpRequest.newBuilder()
                                 .uri(URI.create(pythonApiUrl))
                                 .header("Content-Type", "application/json")
@@ -161,16 +177,13 @@ fun main() {
                     val userText = call.receiveText()
 
                     try {
-                        // KLUCZOWA ZMIANA: Wymuszamy HTTP/1.1 również tutaj
                         val client = HttpClient.newBuilder()
                             .version(HttpClient.Version.HTTP_1_1)
                             .build()
 
-                        // NAPRAWA: Zwykły escape zamiast potrójnych cudzysłowów
                         val escapedQuestion = userText.replace("\"", "\\\"").replace("\n", "\\n")
                         val jsonBody = "{\"question\": \"$escapedQuestion\"}"
 
-                        // NAPRAWA: Dodany nagłówek Accept
                         val request = HttpRequest.newBuilder()
                             .uri(URI.create(pythonApiUrl))
                             .header("Content-Type", "application/json")
