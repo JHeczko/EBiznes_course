@@ -27,6 +27,48 @@ import io.ktor.http.HttpHeaders
 import org.zadanie.Product
 import org.zadanie.Category
 
+// --- ZADANIE 5.0: FUNKCJA POMOCNICZA DO ANALIZY SENTYMENTU ---
+fun analyzeSentiment(userText: String, pythonApiUrl: String): String {
+    return try {
+        val client = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
+            .build()
+
+        val escapedText = userText.replace("\"", "\\\"").replace("\n", "\\n")
+
+        val sentimentPrompt = "Analyze the sentiment of the following text. Respond with ONLY ONE WORD: either 'POSITIVE', 'NEGATIVE', or 'NEUTRAL'. Do not write anything else. Text: "
+        val jsonBody = "{\"question\": \"$sentimentPrompt$escapedText\"}"
+
+        println("\n[API REQUEST] ---> WYSYŁAM PROMPT ANALIZY SENTYMENTU DO FASTAPI:")
+        println(jsonBody)
+
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create(pythonApiUrl))
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        val cleanResult = response.body()
+            .substringAfter("\"response\":\"")
+            .substringBeforeLast("\"}")
+            .trim()
+            .uppercase()
+
+        when {
+            cleanResult.contains("NEGATIVE") -> "NEGATIVE"
+            cleanResult.contains("POSITIVE") -> "POSITIVE"
+            else -> "NEUTRAL"
+        }
+    } catch (e: Exception) {
+        println("Sentiment analysis failed: ${e.message}")
+        "NEUTRAL"
+    }
+}
+// -------------------------------------------------------------
+
 fun main() {
     val categories: List<Category> = listOf(
         Category("Laptopy"),    // ID: 1
@@ -37,27 +79,18 @@ fun main() {
     )
 
     val products: List<Product> = listOf(
-        // Kategoria: Laptopy (cat_id = 1)
         Product(prod_name = "Asus Zenbook 12", price = 2700.0, cat_id = 1),
         Product(prod_name = "MacBook Air M2", price = 5200.0, cat_id = 1),
         Product(prod_name = "Lenovo Legion 5", price = 4500.0, cat_id = 1),
-
-        // Kategoria: Podzespoly (cat_id = 2)
         Product(prod_name = "RTX 4070 Super", price = 2999.0, cat_id = 2),
         Product(prod_name = "Ryzen 7 7800X3D", price = 1600.0, cat_id = 2),
-
-        // Kategoria: Akcesoria (cat_id = 3)
         Product(prod_name = "Logitech G Pro X", price = 450.0, cat_id = 3),
         Product(prod_name = "Klawiatura Keychron K2", price = 380.0, cat_id = 3),
-
-        // Kategoria: Monitory (cat_id = 4)
         Product(prod_name = "Gigabyte M27Q", price = 1300.0, cat_id = 4),
         Product(prod_name = "Samsung Odyssey G5", price = 1100.0, cat_id = 4)
     )
 
-    // --- ZADANIE 4.5: ZLEPIAMY KATEGORIE DO PROMPTA ---
     val allowedCategories = categories.joinToString(", ") { it.cat_name }
-    // --------------------------------------------------
 
     embeddedServer(Netty, port = 8000) {
 
@@ -76,28 +109,34 @@ fun main() {
             val kord = Kord(token)
 
             kord.on<dev.kord.core.event.message.MessageCreateEvent> {
-                println("EVENT TRIGGERED. Message: ${message.content}")
-
                 if (message.author?.isBot == true) return@on
                 if (message.content.isBlank()) return@on
 
                 val text = message.content.trim()
 
                 if (text.startsWith("!ask ")) {
+                    println("\n=================================================")
+                    println("EVENT TRIGGERED (DISCORD). Message: ${message.content}")
+
                     val question = text.substringAfter("!ask ").trim()
 
                     if (question.isNotEmpty()) {
                         try {
+                            val sentiment = analyzeSentiment(question, pythonApiUrl)
+                            println("[WYNIK] Discord Sentiment Detected: $sentiment")
+
                             val client = HttpClient.newBuilder()
                                 .version(HttpClient.Version.HTTP_1_1)
                                 .build()
 
                             val escapedQuestion = question.replace("\"", "\\\"").replace("\n", "\\n")
 
-                            // --- MODYFIKACJA 4.5: SYSTEM PROMPT DLA DISCORDA ---
-                            val systemPrompt = "You are a store assistant. Respond ONLY to questions related to the store's assortment. Our available product categories are: $allowedCategories. If the user asks about anything else, politely decline and say that you only help with matters regarding our assortment. User question: "
+                            val systemPrompt = "You are a store assistant. Respond ONLY to questions related to the store's assortment. Our available product categories are: $allowedCategories. If the user asks about anything else, politely decline. CRITICAL: The detected user sentiment is $sentiment. If NEGATIVE, start your response with a polite apology and use a highly empathetic tone. User question: "
                             val jsonBody = "{\"question\": \"$systemPrompt$escapedQuestion\"}"
-                            // ---------------------------------------------------
+
+                            println("\n[API REQUEST] ---> WYSYŁAM GŁÓWNY PROMPT (DISCORD) DO FASTAPI:")
+                            println(jsonBody)
+                            println("=================================================\n")
 
                             val request = HttpRequest.newBuilder()
                                 .uri(URI.create(pythonApiUrl))
@@ -178,18 +217,25 @@ fun main() {
 
                 post("/api/ask-bot") {
                     val userText = call.receiveText()
+                    println("\n=================================================")
+                    println("EVENT TRIGGERED (FRONTEND). Message: $userText")
 
                     try {
+                        val sentiment = analyzeSentiment(userText, pythonApiUrl)
+                        println("[WYNIK] Frontend Sentiment Detected: $sentiment")
+
                         val client = HttpClient.newBuilder()
                             .version(HttpClient.Version.HTTP_1_1)
                             .build()
 
                         val escapedQuestion = userText.replace("\"", "\\\"").replace("\n", "\\n")
 
-                        // --- MODYFIKACJA 4.5: SYSTEM PROMPT DLA FRONTENDU ---
-                        val systemPrompt = "You are a store assistant. Respond ONLY to questions related to the store's assortment. Our available product categories are: $allowedCategories. If the user asks about anything else, politely decline and say that you only help with matters regarding our assortment. User question: "
+                        val systemPrompt = "You are a store assistant. Respond ONLY to questions related to the store's assortment. Our available product categories are: $allowedCategories. If the user asks about anything else, politely decline. CRITICAL: The detected user sentiment is $sentiment. If NEGATIVE, start your response with a polite apology and use a highly empathetic tone. User question: "
                         val jsonBody = "{\"question\": \"$systemPrompt$escapedQuestion\"}"
-                        // ----------------------------------------------------
+
+                        println("\n[API REQUEST] ---> WYSYŁAM GŁÓWNY PROMPT (FRONTEND) DO FASTAPI:")
+                        println(jsonBody)
+                        println("=================================================\n")
 
                         val request = HttpRequest.newBuilder()
                             .uri(URI.create(pythonApiUrl))
