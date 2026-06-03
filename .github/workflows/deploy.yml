@@ -31,15 +31,15 @@ jobs:
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
-          file: ./backend/Dockerfile
+          context: ./zadanie10/backend
+          file: ./zadanie10/backend/Dockerfile
           push: true
           tags: ${{ env.BACKEND_IMAGE }}
 
       - name: Build and push Frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
+          context: ./zadanie10/frontend
+          file: ./zadanie10/frontend/Dockerfile
           push: true
           tags: ${{ env.FRONTEND_IMAGE }}
