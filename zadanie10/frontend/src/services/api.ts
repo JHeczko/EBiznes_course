@@ -1,0 +1,174 @@
+import axios from 'axios';
+import type {Product, Category, Basket, Payments, AuthResponse} from "../interfaces/definitions.ts";
+
+
+// backend
+const API_URL = 'http://127.0.0.1:13000';
+
+// axios instance
+const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+        "Content-Type": "application/json"
+    },
+    withCredentials: false
+});
+
+// adding bearer auth token to every request
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+
+function validateNumericId(id: number): number {
+    if (id === -1) {
+        throw new Error("User is not logged in");
+    }
+
+    if (!Number.isInteger(id) || id < 0) {
+        throw new Error("Invalid User ID");
+    }
+
+    return id;
+}
+
+function sanitizePathId(id: number): string {
+    const validatedId = validateNumericId(id);
+
+    return encodeURIComponent(String(validatedId));
+}
+
+function validateQuantity(quantity: number | undefined): number | undefined {
+    if (quantity === undefined) {
+        return undefined
+    }
+
+    if (!Number.isInteger(quantity) || quantity < 1) {
+        throw new Error("Invalid quantity");
+    }
+
+    return quantity;
+}
+
+// ===== PRODUCTS =====
+
+export async function getProducts(): Promise<Product[]> {
+    const res = await api.get<Product[]>('/products');
+    return res.data;
+}
+
+export async function getProductById(id: number): Promise<Product> {
+    const safeId = sanitizePathId(id);
+
+    const res = await api.get<Product>(`/products/${safeId}`);
+    return res.data;
+}
+
+
+// ===== CATEGORY =====
+
+export async function getCategories(): Promise<Category[]> {
+    const res = await api.get<Category[]>('/category');
+    return res.data;
+}
+
+
+// ===== BASKET =====
+
+export async function getBasket(userID: number): Promise<Basket[]> {
+    const safeId = sanitizePathId(userID);
+    const res = await api.get<Basket[]>(`/cart/${safeId}`);
+    return res.data;
+}
+
+export async function addToBasket(product: Product, userID: number, quantity?: number): Promise<number> {
+    const safeId = sanitizePathId(userID);
+    const safeQuantity = validateQuantity(quantity);
+
+    const res = await api.post(`/cart/${safeId}`, null, {
+        params: {
+            prod_id: product.id,
+            quantity: safeQuantity
+        }
+    });
+
+    return res.status;
+}
+
+export async function updateBasket(product: Product, userID: number, quantity: number): Promise<[Basket, number]> {
+    const validUserID = Number(userID);
+    // 🔥 Dodatkowe zabezpieczenie przed -1 przed wykonaniem dalszego kodu
+    validateNumericId(validUserID);
+
+    const safeId = sanitizePathId(validUserID);
+    const safeQuantity = validateQuantity(quantity);
+
+    const res = await api.patch(`/cart/${safeId}`, null, {
+        params: {
+            prod_id: product.id,
+            quantity: safeQuantity
+        }
+    });
+    return [res.data, res.status];
+}
+
+export async function deleteBasket(product: Product, userID: number): Promise<number> {
+    const validUserID = Number(userID);
+    validateNumericId(validUserID);
+
+    const safeId = sanitizePathId(validUserID);
+    const res = await api.delete(`/cart/${safeId}`, {
+        params: {
+            prod_id: product.id
+        }
+    });
+
+    return res.status;
+}
+
+export async function clearBasket(userID: number): Promise<number> {
+    const safeId = sanitizePathId(userID);
+    const res = await api.delete(`/cart/${safeId}`);
+    return res.status;
+}
+
+
+// ===== PAYMENTS =====
+
+export async function addPayment(userID: number): Promise<[Payments, number]> {
+    const safeId = sanitizePathId(userID);
+    const res = await api.post(`/payments/${safeId}`);
+    return [res.data, res.status];
+}
+
+// ====== LOGIN/REGISTER ======
+export const loginUser = async (email: string, password: string): Promise<AuthResponse> => {
+    const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Logowanie nieudane');
+    }
+
+    return await response.json();
+};
+
+export const registerUser = async (email: string, password: string): Promise<AuthResponse> => {
+    const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) throw new Error('Rejestracja nieudana');
+    return await response.json();
+};

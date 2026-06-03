@@ -1,0 +1,142 @@
+.cart-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 2rem;
+}
+
+.cart-page h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
+}
+
+.cart-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.empty-cart-message {
+    color: #4b5563; /* Spójny z Twoją klasą .category */
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1.2rem;
+}
+
+.cart-item {
+    background-color: #eee; /* Tło identyczne jak w .product-card oraz .category-item */
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 15px; /* Spójne zaokrąglenie z resztą kafelków */
+    padding: 20px;
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
+}
+
+.cart-item:hover {
+    transform: scale(1.01);
+}
+
+.item-upper h3 {
+    margin: 0;
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+.item-lower {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.control-quantity {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.quantity-control-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #ddd;
+    border-radius: 50%; /* Okrągłe guziki kontroli dla lżejszego wyglądu */
+    background: #fff;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.2s;
+    color: #1a1a1a;
+}
+
+.quantity-control-button:hover {
+    background: #e9d5ff; /* Fioletowy hover pasujący do reszty */
+    border-color: #a855f7;
+}
+
+.delete-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    color: #d32f2f;
+    margin-left: 0.5rem;
+    transition: background 0.2s;
+}
+
+.delete-button:hover {
+    background: #fdecea;
+}
+
+.price-tag-cart {
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: #333;
+}
+
+/* Przycisk kasy i powrotu - 1:1 Twój cta-button / add-to-cart-btn */
+.checkout-button {
+    background-color: #9333ea;
+    color: white;
+    border: none;
+    outline: none;
+    padding: 12px 40px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.2s;
+    display: inline-block;
+    text-decoration: none;
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.checkout-button:hover {
+    background-color: #7e22ce;
+    transform: translateY(-3px);
+}
+
+.checkout-button:active {
+    transform: translateY(1px);
+}
+
+.checkout-button:focus-visible {
+    outline: 2px solid #a855f7;
+    outline-offset: 2px;
+}

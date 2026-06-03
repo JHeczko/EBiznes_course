@@ -87,8 +87,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-WS-252.27397.92" />
       </set>
     </attachedChunks>
   </component>
@@ -121,7 +120,10 @@
       <workItem from="1780008036358" duration="55000" />
       <workItem from="1780040878357" duration="193000" />
       <workItem from="1780041085091" duration="2862000" />
-      <workItem from="1780051219998" duration="655000" />
+      <workItem from="1780051219998" duration="983000" />
+      <workItem from="1780052485309" duration="210000" />
+      <workItem from="1780086161605" duration="2739000" />
+      <workItem from="1780130442672" duration="679000" />
     </task>
     <servers />
   </component>
@@ -142,16 +144,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/zadanie9/dc_bot/src/main/kotlin/Main.kt</url>
-          <line>84</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

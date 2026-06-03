@@ -1,0 +1,6 @@
+.git
+.env
+api_tests/
+*.db
+*.out
+node_modules/
