@@ -222,3 +222,7 @@ Demo:
 - 4.5 Dodać krok z deploymentem aplikacji klienckiej na chmurę (obie ze sobą rozmawiają)
 - 5.0 Dodać uruchomienie regresyjnych testów automatycznych(funkcjonalnych) jako krok w Actions w Browserstacku
 
+> tutaj nie bedzie comittow podanych, bo w zasadzie wszystko bo narazie jest tylko zadanie 3.0 ktore bazuje na tym, aby wszystko ladnie wsadzic na chmure
+
+Videos:
+- 3.0: https://drive.google.com/file/d/1Ifu5rQrzaYgDi0aO4DWF2xc35c1OeDs6/view?usp=sharing
