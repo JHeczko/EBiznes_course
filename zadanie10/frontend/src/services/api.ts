@@ -3,7 +3,7 @@ import type {Product, Category, Basket, Payments, AuthResponse} from "../interfa
 
 
 // backend
-const API_URL = 'http://127.0.0.1:13000';
+const API_URL = 'http://20.215.33.162:13000';
 
 // axios instance
 const api = axios.create({

@@ -1,23 +1,27 @@
-version: '3.8'
-
 networks:
   my-network:
     driver: bridge
 
 services:
   backend-service:
-    image: ghcr.io/jheczko/ebiznes_course-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: jheczko/backend_business_app:latest
     container_name: go-backend-service
     ports:
       - "13000:13000"
     networks:
       - my-network
     env_file:
-      - .env
+      - backend/.env
     restart: always
 
   frontend-service:
-    image: ghcr.io/jheczko/ebiznes_course-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: jheczko/frontend_business_app:latest
     container_name: react-frontend-service
     ports:
       - "5173:8080"
