@@ -12,7 +12,7 @@ COPY middleware_handlers/ middleware_handlers/
 COPY models/ models/
 COPY db_init/ db_init/
 
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm64 \
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 \
     go build -ldflags '-extldflags "-static"' -o server.out
 
 # second part - starting binary on light alpine version
